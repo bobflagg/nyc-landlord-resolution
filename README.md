@@ -60,7 +60,7 @@ uv run python -m nlr.eval.run_full     # full-population run + precision guard +
 
 ## Where it comes from — and the Who Owns What integration
 
-This is the record-linkage engine built for **[WatchlineNYC](https://github.com/…)**,
+This is the record-linkage engine built for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**,
 extracted to stand on its own. It pairs naturally with JustFix's
 **[Who Owns What](https://github.com/JustFixNYC/who-owns-what)** (WoW): WoW already models
 portfolios as a graph of landlord nodes linked by name/address matches, then clusters them
