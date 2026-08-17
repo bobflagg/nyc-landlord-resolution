@@ -58,6 +58,29 @@ uv run python -m nlr.eval.run_eval     # fit + threshold sweep + score vs the go
 uv run python -m nlr.eval.run_full     # full-population run + precision guard + export
 ```
 
+### Run without Postgres
+
+Snapshot the two HPD tables once, then run the resolution and the eval entirely offline
+over DuckDB — no database in the loop:
+
+```bash
+uv run python -m nlr.snapshot data        # Postgres -> data/*.parquet (~17 MB, run once)
+NLR_SNAPSHOT=data uv run python -m nlr.eval.run_eval   # same eval, DuckDB backend
+```
+
+```python
+from nlr import owner_index
+from nlr.db import duckdb_conn
+
+owners = owner_index(duckdb_conn("data/hpd_contacts.parquet",
+                                 "data/hpd_registrations.parquet"))
+```
+
+The Postgres SQL is dialect-dispatched onto DuckDB, so results match — the gold benchmark
+reproduces **P ≈ 0.996** on either backend. (One caveat: `owner_index`'s ~10% training slice
+is hash-derived, and DuckDB's hash ≠ Postgres's, so a borderline operator can consolidate
+marginally differently; precision is identical. Use the Postgres path for exact parity.)
+
 ## Where it comes from — and the Who Owns What integration
 
 This is the record-linkage engine built for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**,
@@ -84,10 +107,12 @@ fragmented portfolios with zero namesake fusions.
 
 ## Status / roadmap
 
-- **v1 (here):** the resolution engine + gold-set benchmark, over a Postgres holding the HPD
-  tables.
-- **Next:** a **DuckDB-native** path — point at the public HPD open-data CSVs, `pip install`
-  → run, no database at all — and a bundled sample so it runs on clone.
+- **Resolution engine + gold-set benchmark** over a Postgres holding the HPD tables.
+- **DuckDB snapshot path** (done) — `python -m nlr.snapshot` then run offline over Parquet,
+  no database. Same engine, same gold numbers.
+- **Next — DuckDB-native over the public CSVs:** a loader that reads the HPD open-data CSVs
+  directly (column-maps and constructs BBL), so `pip install` → point at the open data → run,
+  with no Postgres ever needed to seed the snapshot.
 
 ## License
 

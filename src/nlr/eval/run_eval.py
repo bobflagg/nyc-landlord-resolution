@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from nlr.db import pg_conn
+from nlr.db import default_conn
 from nlr import splink_source as ss
 from nlr.eval import scorer
 from nlr.eval.build_gold import TARGET_WHERE, NBR_WHERE, OFFICE_WHERE
@@ -16,7 +16,7 @@ GOLD = Path(scorer.__file__).parent / "gold_set.csv"
 
 
 def main():
-    conn = pg_conn()
+    conn = default_conn()
     # A denser population than the full sample: Splink's "probability two random
     # records match" collapses toward zero on a huge mostly-unique set, which starves
     # the model. ~2k gives a stable prior while still carrying real name-rarity for TF.

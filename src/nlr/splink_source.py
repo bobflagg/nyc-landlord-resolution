@@ -26,11 +26,58 @@ Design notes:
 """
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
 # The owner roles WoW keeps; agents/managers are excluded (shared across
 # unrelated landlords -> false links via registered-agent addresses).
 OWNER_ROLES = "{HeadOfficer,IndividualOwner,CorporateOwner,JointOwner}"
+
+
+# --- dialect dispatch -------------------------------------------------------
+# The extraction SQL below is authored in Postgres and stays byte-identical (the
+# WoW pipeline passes a live psycopg2 connection into owner_index; that path must
+# not move). The no-Postgres path (db.duckdb_conn, reading the HPD tables from
+# local parquet/CSV) runs the *same* SQL through DuckDB, differing only in a
+# handful of function spellings. Rather than maintain a second copy, `_read`
+# detects a DuckDB connection and derives the DuckDB dialect with exact
+# substitutions — all semantically identical, verified against the gold set.
+def _is_duckdb(conn) -> bool:
+    # duckdb's connection type is `_duckdb.DuckDBPyConnection`; psycopg2's is
+    # `psycopg2.extensions.connection`. Match on the type name to be import-free.
+    return type(conn).__name__ == "DuckDBPyConnection"
+
+
+def _duckdb_sql(sql: str) -> str:
+    """Rewrite the Postgres extraction SQL (including an injected `where`) into the
+    equivalent DuckDB dialect. Each substitution is behaviour-preserving:
+      * ``= ANY('{a,b}')``     (PG owner-role array literal)  -> ``IN ('a','b')``
+      * ``= ANY(ARRAY[...])``  (PG array-constructor, eval)   -> ``IN (...)``
+      * ``array_remove(array_agg(x), NULL)``                  -> ``list_filter(array_agg(x), ...)``
+      * ``btrim(``  (PG whitespace trim)                      -> ``trim(``  (same for our 1-arg use)
+      * ``hashtext(`` (PG signed hash, only in the slice)     -> ``hash(``  (DuckDB unsigned hash)
+    The last two names don't exist in DuckDB / Postgres respectively; everything else
+    (`DISTINCT ON`, `regexp_replace(...,'i'|'g')`, `NULLS LAST`, `md5`, ordered
+    `array_agg`, `random()`) is common to both engines and passes through untouched."""
+    sql = (sql
+           .replace("= ANY('{HeadOfficer,IndividualOwner,CorporateOwner,JointOwner}')",
+                    "IN ('HeadOfficer', 'IndividualOwner', 'CorporateOwner', 'JointOwner')")
+           .replace("array_remove(array_agg(DISTINCT assoc_corp), NULL)",
+                    "list_filter(array_agg(DISTINCT assoc_corp), x -> x IS NOT NULL)")
+           .replace("btrim(", "trim(")
+           .replace("hashtext(", "hash("))
+    # `col = ANY(ARRAY['a','b'])` -> `col IN ('a','b')` (gold-slice predicates); the array
+    # bodies are flat quoted literals, so a non-greedy bracket match is sufficient.
+    return re.sub(r"=\s*ANY\(ARRAY\[(.*?)\]\)", r"IN (\1)", sql)
+
+
+def _read(conn, sql: str) -> pd.DataFrame:
+    """Run a read query on either backend, returning a DataFrame. Postgres via
+    pandas; DuckDB via its native cursor over the dialect-rewritten SQL."""
+    if _is_duckdb(conn):
+        return conn.execute(_duckdb_sql(sql)).df()
+    return pd.read_sql(sql, conn)   # no params -> LIKE '%' in `where` stays literal
 
 # `__WHERE__` is replaced (not %-parameterized) so callers can inject a slice
 # predicate over the `c.` contact alias, e.g. "random() < 0.004" or a name list.
@@ -109,8 +156,7 @@ def extract(conn, where: str = "TRUE") -> pd.DataFrame:
     population (e.g. ``"random() < 0.004"``). It is trusted internal SQL, not
     user input.
     """
-    sql = EXTRACT_SQL.replace("__WHERE__", where)
-    return pd.read_sql(sql, conn)   # no params -> LIKE '%' in `where` stays literal
+    return _read(conn, EXTRACT_SQL.replace("__WHERE__", where))
 
 
 # Distinct landlords per (house, normalized street) across the WHOLE owner-contact
@@ -139,7 +185,7 @@ GROUP BY h, s
 def address_degrees(conn) -> pd.DataFrame:
     """Full-population (house, biz_street_norm) -> distinct-landlord count. Pass to
     ``fit(addr_degrees=...)`` so the aggregator mask uses real degrees, not sample."""
-    return pd.read_sql(ADDR_DEGREE_SQL, conn)
+    return _read(conn, ADDR_DEGREE_SQL)
 
 
 # Distinct landlords per corporation name — the corp analog of address degree. A
@@ -161,7 +207,7 @@ GROUP BY corp
 def corp_degrees(conn) -> pd.DataFrame:
     """Full-population corp -> distinct-landlord count, to cap aggregator corps in
     the feedback merge."""
-    return pd.read_sql(CORP_DEGREE_SQL, conn)
+    return _read(conn, CORP_DEGREE_SQL)
 
 
 # Distinct landlord identities per (last name, first initial) — name rarity. A rare
@@ -185,7 +231,7 @@ GROUP BY last, init
 def name_freq(conn) -> pd.DataFrame:
     """Full-population (last name, first initial) -> distinct-identity count, to gate
     the feedback merge to rare names."""
-    return pd.read_sql(NAME_FREQ_SQL, conn)
+    return _read(conn, NAME_FREQ_SQL)
 
 
 # Address columns blanked when an address is an aggregator (see _mask_aggregators).

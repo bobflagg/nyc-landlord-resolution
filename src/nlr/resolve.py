@@ -18,6 +18,12 @@ from . import splink_source as ss
 # gold-operator slice) merges more, but a plain small random slice under-samples specific
 # operators and fragments them, and a cross-office-name enrichment did not help (it enlarges
 # the slice, lowering λ). Precision never depends on this knob — only how much consolidation.
+#
+# DuckDB note: `splink_source._duckdb_sql` maps `hashtext` -> DuckDB's `hash`, so the
+# no-Postgres path samples a *different* ~10% (different algorithm, not a different rate).
+# Precision is identical and most operators consolidate identically; a borderline operator
+# can land a fragment or two differently (e.g. Croman 1 cluster on Postgres, ~3 near-fragments
+# on DuckDB). Same recall lever, backend-dependent — use the Postgres path for exact parity.
 _TRAIN_SAMPLE = ("abs(hashtext(coalesce(c.firstname,'')||coalesce(c.lastname,'')"
                  "||coalesce(c.businesshousenumber,''))) % 1000 < 100")
 
