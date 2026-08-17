@@ -9,12 +9,15 @@ import re
 
 from . import splink_source as ss
 
-# ~10% deterministic dense training slice. fit_predict_full trains m/u/λ here (where λ is
-# well-conditioned) and predicts over the full population — the low-λ trap fix. Hash-based
-# (not random()) so a run reproduces. Gold-free (no eval-operator seeding) — RE-VALIDATED:
-# at ~10% the fragmented operators still consolidate (Croman -> one portfolio, recall 1.0,
-# 0 different-surname clusters); a ~2% slice under-merged them, because the slice must carry
-# enough same-owner-across-offices examples to learn cross-office merges (density matters).
+# ~10% deterministic dense training slice — a RECALL tuning lever. fit_predict_full trains
+# m/u/λ here (low-λ trap fix) and predicts over the full population; hash-based (not random())
+# so a run reproduces. Slice size sets λ *inversely* — a smaller slice merges MORE. ~10% is
+# a good operating point: the big fragmented operators consolidate (Croman -> one portfolio)
+# and precision is unaffected (0 different-surname clusters at every size tested). It is NOT
+# tuned for maximum consolidation, and it's fiddly: a *targeted* small slice (the eval's
+# gold-operator slice) merges more, but a plain small random slice under-samples specific
+# operators and fragments them, and a cross-office-name enrichment did not help (it enlarges
+# the slice, lowering λ). Precision never depends on this knob — only how much consolidation.
 _TRAIN_SAMPLE = ("abs(hashtext(coalesce(c.firstname,'')||coalesce(c.lastname,'')"
                  "||coalesce(c.businesshousenumber,''))) % 1000 < 100")
 
