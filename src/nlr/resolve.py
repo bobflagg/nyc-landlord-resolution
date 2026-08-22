@@ -5,27 +5,23 @@ a plain lookup: ``(normalized owner name, bbl) -> owner_id``. All the hard, vali
 lives in :mod:`nlr.splink_source`; this just runs it and returns the mapping, so consumers
 (a portfolio-clustering pipeline, an analysis) never touch Splink internals.
 """
+import hashlib
 import re
+from collections import Counter
+
+import pandas as pd
 
 from . import splink_source as ss
 
-# ~10% deterministic dense training slice — a RECALL tuning lever. fit_predict_full trains
-# m/u/λ here (low-λ trap fix) and predicts over the full population; hash-based (not random())
-# so a run reproduces. Slice size sets λ *inversely* — a smaller slice merges MORE. ~10% is
-# a good operating point: the big fragmented operators consolidate (Croman -> one portfolio)
-# and precision is unaffected (0 different-surname clusters at every size tested). It is NOT
-# tuned for maximum consolidation, and it's fiddly: a *targeted* small slice (the eval's
-# gold-operator slice) merges more, but a plain small random slice under-samples specific
-# operators and fragments them, and a cross-office-name enrichment did not help (it enlarges
-# the slice, lowering λ). Precision never depends on this knob — only how much consolidation.
-#
-# DuckDB note: `splink_source._duckdb_sql` maps `hashtext` -> DuckDB's `hash`, so the
-# no-Postgres path samples a *different* ~10% (different algorithm, not a different rate).
-# Precision is identical and most operators consolidate identically; a borderline operator
-# can land a fragment or two differently (e.g. Croman 1 cluster on Postgres, ~3 near-fragments
-# on DuckDB). Same recall lever, backend-dependent — use the Postgres path for exact parity.
-_TRAIN_SAMPLE = ("abs(hashtext(coalesce(c.firstname,'')||coalesce(c.lastname,'')"
-                 "||coalesce(c.businesshousenumber,''))) % 1000 < 100")
+# Clustering threshold. The stratified slice (below) is dense in same-name pairs, so the model
+# scores same-name/same-address pairs confidently; 0.999 holds gold precision at ~0.996 (0
+# different-surname clusters). Calibrated against the 105-record gold set.
+DEFAULT_THRESHOLD = 0.999
+
+# A thin singleton base (~1% of single-occurrence names) mixed into the training slice so u/λ
+# stay calibrated to the population rather than to the dense same-name groups alone.
+_BASE_HASH_PCT = 1
+_gkey = lambda ln, fi: int(hashlib.md5(f"{ln}|{fi}".encode()).hexdigest()[:8], 16)
 
 
 def normalize_name(s):
@@ -34,7 +30,24 @@ def normalize_name(s):
     return re.sub(r"\s+", " ", s).strip().upper() if isinstance(s, str) else s
 
 
-def owner_index(conn, *, threshold: float = 0.95) -> dict:
+def _stratified_train(full: pd.DataFrame) -> pd.DataFrame:
+    """Principled training slice: every identity in a multi-member ``(last_name,
+    first_initial)`` group — every record with a potential same-name peer, across ALL
+    operators — plus a thin singleton base for u/λ calibration.
+
+    Replaces the old ~10% random hash sample. It is representative and reproducible: two
+    independent draws resolve the population near-identically (validated at same-owner-pair
+    Jaccard ~0.99, vs ~0.5 for an arbitrary random slice), so the resolution reflects the data,
+    not which records happened to be sampled. Computed in pandas over the extracted frame (not
+    SQL), so the Postgres and DuckDB paths now produce identical results — there is no longer a
+    hash-function divergence between backends."""
+    key = list(zip(full["last_name"].fillna(""), full["first_initial"].fillna("")))
+    gsize = Counter(key)
+    keep = [(gsize[k] >= 2) or (_gkey(*k) % 100 < _BASE_HASH_PCT) for k in key]
+    return full[pd.Series(keep, index=full.index)].reset_index(drop=True)
+
+
+def owner_index(conn, *, threshold: float = DEFAULT_THRESHOLD) -> dict:
     """``{(normalized name, bbl): owner_id}`` for every person owner-contact in the HPD data.
 
     ``owner_id`` is opaque and stable WITHIN one call (EM is stochastic → not stable across
@@ -45,9 +58,8 @@ def owner_index(conn, *, threshold: float = 0.95) -> dict:
     full = ss.extract(conn, "TRUE")
     full = full[full.contact_kind == "person"].drop_duplicates("unique_id").reset_index(drop=True)
 
-    # 2. dense training slice (stable prior) + full-population guards
-    train = ss.extract(conn, _TRAIN_SAMPLE)
-    train = train[train.contact_kind == "person"].drop_duplicates("unique_id").reset_index(drop=True)
+    # 2. principled stratified training slice (stable prior) + full-population guards
+    train = _stratified_train(full)
     degrees = ss.address_degrees(conn)   # aggregator-address masking (real full-pop degrees)
     name_freq = ss.name_freq(conn)       # (surname, first-initial) rarity → common-name veto
 

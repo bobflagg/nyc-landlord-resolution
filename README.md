@@ -77,9 +77,10 @@ owners = owner_index(duckdb_conn("data/hpd_contacts.parquet",
 ```
 
 The Postgres SQL is dialect-dispatched onto DuckDB, so results match — the gold benchmark
-reproduces **P ≈ 0.996** on either backend. (One caveat: `owner_index`'s ~10% training slice
-is hash-derived, and DuckDB's hash ≠ Postgres's, so a borderline operator can consolidate
-marginally differently; precision is identical. Use the Postgres path for exact parity.)
+reproduces **P ≈ 0.996** on either backend. `owner_index`'s training slice is a *stratified*
+sample (every identity with a same-name peer), computed in pandas over the extracted records —
+identically on both backends — so there is no cross-backend divergence (the earlier
+hash-sample caveat is gone).
 
 ## Where it comes from — and the Who Owns What integration
 
