@@ -1,14 +1,14 @@
 unique_id,gold_entity_id,case_tag,name_full,biz_house,biz_street,biz_zip,n_bbls
-5542045a5ce0462ce1e24f11cf1b2616,e_castellano_andrea_7117_72ND,castellano_andrea @ 7117_72ND,ANDREA CASTELLANO,7117,72ND STREET,11385,3
-398cc8813ef87fd8a36fa560d327906a,e_castellano_anglela_50_HIGHLA,castellano_anglela @ 50_HIGHLA,ANGLELA CASTELLANO,50,HIGHLAWN AVENUE,11223,1
-ea19411f5395bf748f968f7be8ffe478,e_castellano_bart_183_AVE,castellano_bart @ 183_AVE,BART CASTELLANO,183,AVE U,11223,1
-6b85f220bd8c4fe3d3049757ca939dd6,e_castellano_filippo_7117_72ND,castellano_filippo @ 7117_72ND,FILIPPO CASTELLANO,7117,72ND STREET,11385,2
-2f161f93b315cffe26671380764f1667,e_castellano_filomena_1855_BAY,castellano_filomena @ 1855_BAY,FILOMENA CASTELLANO,1855,BAY RIDGE PARKWAY,11204,1
-570b6a1544646aec73b1d99758d72798,e_castellano_francesco_579_CARROL,castellano_francesco @ 579_CARROL,FRANCESCO CASTELLANO,579,CARROLL STREET,11215,1
-a4257ebbe4f7a700bcdfdb2da383277e,e_castellano_letizia_20-3_STEINW,castellano_letizia @ 20-3_STEINW,LETIZIA CASTELLANO,20-34,STEINWAY STREET,11105,1
-84c5dc8aa5f10ff90c3d8a3f7963538c,e_castellano_michael_363_14TH,castellano_michael @ 363_14TH,MICHAEL CASTELLANO,363,14TH STREET,11215,1
-0768204a2ba5f3c0de6e0b856be12c0a,e_castellano_rose_337_UNION,castellano_rose @ 337_UNION,ROSE CASTELLANO,337,UNION STREET,11231,1
-9b5b659afd5841a21c135058472e18d0,e_castellano_safeena_9300_PO,castellano_safeena @ 9300_PO,SAFEENA CASTELLANO,930045,PO BOX 930045TH,11693,1
+5542045a5ce0462ce1e24f11cf1b2616,e_castellano_andrea,castellano_andrea (one operator — offices merged),ANDREA CASTELLANO,7117,72ND STREET,11385,3
+398cc8813ef87fd8a36fa560d327906a,e_castellano_anglela,castellano_anglela (one operator — offices merged),ANGLELA CASTELLANO,50,HIGHLAWN AVENUE,11223,1
+ea19411f5395bf748f968f7be8ffe478,e_castellano_bart,castellano_bart (one operator — offices merged),BART CASTELLANO,183,AVE U,11223,1
+6b85f220bd8c4fe3d3049757ca939dd6,e_castellano_filippo,castellano_filippo (one operator — offices merged),FILIPPO CASTELLANO,7117,72ND STREET,11385,2
+2f161f93b315cffe26671380764f1667,e_castellano_filomena,castellano_filomena (one operator — offices merged),FILOMENA CASTELLANO,1855,BAY RIDGE PARKWAY,11204,1
+570b6a1544646aec73b1d99758d72798,e_castellano_francesco,castellano_francesco (one operator — offices merged),FRANCESCO CASTELLANO,579,CARROLL STREET,11215,1
+a4257ebbe4f7a700bcdfdb2da383277e,e_castellano_letizia,castellano_letizia (one operator — offices merged),LETIZIA CASTELLANO,20-34,STEINWAY STREET,11105,1
+84c5dc8aa5f10ff90c3d8a3f7963538c,e_castellano_michael,castellano_michael (one operator — offices merged),MICHAEL CASTELLANO,363,14TH STREET,11215,1
+0768204a2ba5f3c0de6e0b856be12c0a,e_castellano_rose,castellano_rose (one operator — offices merged),ROSE CASTELLANO,337,UNION STREET,11231,1
+9b5b659afd5841a21c135058472e18d0,e_castellano_safeena,castellano_safeena (one operator — offices merged),SAFEENA CASTELLANO,930045,PO BOX 930045TH,11693,1
 a05c57ba9261ef6a1f860565dca83bf9,e_castellano_scott,castellano_scott (one operator — corp-bridged offices),SCOTT CASTELLANO,22,22ND WEST 21ST STREET,10010,1
 05ade5c2ab2f9cadd1115c84bff6e66d,e_castellano_scott,castellano_scott (one operator — corp-bridged offices),SCOTT CASTELLANO,22,WEST 21ST,10010,1
 02c4f5ad5dd9bd264f888e12b05c2adb,e_castellano_scott,castellano_scott (one operator — corp-bridged offices),SCOTT CASTELLANO,22,WEST 21ST STREET,10010,16
@@ -16,7 +16,7 @@ a05c57ba9261ef6a1f860565dca83bf9,e_castellano_scott,castellano_scott (one operat
 dc4fbc0e4242bc7e055a8c47181e9ede,e_castellano_scott,castellano_scott (one operator — corp-bridged offices),SCOTT CASTELLANO,22,WEST 21ST STREET,10010,6
 52dd416b04828cbab65dd09c00e83c8a,e_castellano_scott,castellano_scott (one operator — corp-bridged offices),SCOTT CASTELLANO,254,WEST 31ST STREET,10001,33
 1009b79761f8c1c272a4e9c9a3390ddc,e_castellano_scott,castellano_scott (one operator — corp-bridged offices),SCOTT CASTELLANO,254,WEST 31ST STREET,10001,7
-fc4f3a62a6aa4b1a9ccab1183b1328a6,e_castellano_vincenza_50_HIGHLA,castellano_vincenza @ 50_HIGHLA,VINCENZA CASTELLANO,50,HIGHLAWN AVENUE,11223,1
+fc4f3a62a6aa4b1a9ccab1183b1328a6,e_castellano_vincenza,castellano_vincenza (one operator — offices merged),VINCENZA CASTELLANO,50,HIGHLAWN AVENUE,11223,1
 9848e41941107b9a763a44896154f88a,e_croman,croman (one operator — all offices merged),STEVE CROMAN,424,WEST 51ST STREET,10019,3
 641c0f4ee3c957f80387aa0e36992e56,e_croman,croman (one operator — all offices merged),STEVE CROMAN,740,BROADWAY,10003,2
 b181226a7cd4c7d078dbbf67d1e2f2d9,e_croman,croman (one operator — all offices merged),STEVEN CROMAN,4,WEST 51ST STREET,10019,1
@@ -32,15 +32,15 @@ fe8c1a5daacb11151d957236959a6909,e_croman,croman (one operator — all offices m
 4afd4bf34b71edd6a6a913e33c5cb80f,e_croman,croman (one operator — all offices merged),STEVEN CROMAN,740,BROADWAY,10006,1
 f6e04245318855362a18efb715f9114b,e_croman,croman (one operator — all offices merged),STEVEN CROMAN,740,BROADWAY,10003,1
 71d3a04d50b4cba68f4754a8a8d2c827,e_croman,croman (one operator — all offices merged),STEVEN CROMAN,740,BROADWAY,10003,1
-c67826f9fe7b8cb48312bdc58aa57caf,e_kadden_10_BOND,kadden @ 10_BOND (same-office must-merge),ZACH KADDEN,10,BOND STREET,11021,1
-876ca93fa92e5d7e4b9e17347e1e04ba,e_kadden_244_WEST,kadden @ 244_WEST (same-office must-merge),ZACH KADDEN,244,WEST 54TH STREET,10019,1
-5cf2ce601efec115613a61c870bdc0f1,e_kadden_490_MYRTLE,kadden @ 490_MYRTLE (same-office must-merge),ZACHARY KADDEN,490,MYRTLE AVENUE,11205,1
-3dc375e120b6b42f3cf37abf86246b2e,e_kadden_504_MYRTLE,kadden @ 504_MYRTLE (same-office must-merge),ZACHARY KADDEN,504,MYRTLE AVENUE,11205,1
-b44f07118e8376ee4dbeb96784b27837,e_kadden_520mad,kadden @ 520mad (same-office must-merge),ZACH KADDEN,520,MADISON AVENUE,10022,6
-1de52519381d201f4906c5c5bb7d866f,e_kadden_520mad,kadden @ 520mad (same-office must-merge),ZACHARY KADDEN,520,MADISON AVENUE,10022,15
-580eca43829b668456f4de1f85040cf2,e_kadden_520mad,kadden @ 520mad (same-office must-merge),ZACHARY KADDEN,520,MADISON AVENUE,10022,1
-a1b67bdfaa7ec3bd94089b3954cc76dc,e_kadden_575fifth,kadden @ 575fifth (same-office must-merge),ZACHARY KADDEN,575,FIFTH AVENUE,10017,11
-ba7a4fd6e017f2735eaa776bdaf57d92,e_kadden_5804_TYNDAL,kadden @ 5804_TYNDAL (same-office must-merge),ZACHARY KADDEN,5804A,TYNDALL AVENUE,10471,1
+c67826f9fe7b8cb48312bdc58aa57caf,e_kadden,kadden (one operator — offices merged),ZACH KADDEN,10,BOND STREET,11021,1
+876ca93fa92e5d7e4b9e17347e1e04ba,e_kadden,kadden (one operator — offices merged),ZACH KADDEN,244,WEST 54TH STREET,10019,1
+b44f07118e8376ee4dbeb96784b27837,e_kadden,kadden (one operator — offices merged),ZACH KADDEN,520,MADISON AVENUE,10022,6
+5cf2ce601efec115613a61c870bdc0f1,e_kadden,kadden (one operator — offices merged),ZACHARY KADDEN,490,MYRTLE AVENUE,11205,1
+3dc375e120b6b42f3cf37abf86246b2e,e_kadden,kadden (one operator — offices merged),ZACHARY KADDEN,504,MYRTLE AVENUE,11205,1
+1de52519381d201f4906c5c5bb7d866f,e_kadden,kadden (one operator — offices merged),ZACHARY KADDEN,520,MADISON AVENUE,10022,15
+580eca43829b668456f4de1f85040cf2,e_kadden,kadden (one operator — offices merged),ZACHARY KADDEN,520,MADISON AVENUE,10022,1
+a1b67bdfaa7ec3bd94089b3954cc76dc,e_kadden,kadden (one operator — offices merged),ZACHARY KADDEN,575,FIFTH AVENUE,10017,11
+ba7a4fd6e017f2735eaa776bdaf57d92,e_kadden,kadden (one operator — offices merged),ZACHARY KADDEN,5804A,TYNDALL AVENUE,10471,1
 c182278c1d1eccd57af3008cc33fed7c,e_nbr_ADAM_BERNSTEIN,aggregator_neighbour (must-NOT-merge),ADAM BERNSTEIN,575,FIFTH AVENUE,10017,1
 b090db0535896e5831d6934c65286663,e_nbr_ADAM_GANSER,aggregator_neighbour (must-NOT-merge),ADAM GANSER,254,WEST 31ST STREET,10001,1
 8dcc86f37890304723f85c61d8d9937e,e_nbr_ADAM_GREENBERG,aggregator_neighbour (must-NOT-merge),ADAM GREENBERG,254,WEST 31ST STREET,10001,1
@@ -79,28 +79,28 @@ e5b27def817c9a6c52eb0ea81a99fb0c,e_office_223_braver_joel,office-mate @ 223 spen
 ce1c95be67a7dc32db169b75666f3799,e_office_223_lebowitz_abraham,office-mate @ 223 spencer (must-NOT-merge),ABRAHAM LEBOWITZ,223,SPENCER STREET,11205,2
 7b827cb1ef0ccf20f163a7b79df32095,e_office_223_leifer_joel,office-mate @ 223 spencer (must-NOT-merge),JOEL LEIFER,223,SPENCER,11205,1
 b1dcb07b63b35ee0b8ce671fe1f7cc25,e_office_223_leifer_joel,office-mate @ 223 spencer (must-NOT-merge),JOEL LEIFER,223,SPENCER STREET,11205,2
-fc80100f0b3fa2ced81b2500847791d2,e_rashad_divya_106_SPRING,rashad_divya @ 106_SPRING,DIVYA RASHAD,106,SPRING STREET,10012,1
-cad668db70062e4b071cb936c1d47d1c,e_rashad_divya_114_LIBERT,rashad_divya @ 114_LIBERT,DIVYA RASHAD,114,LIBERTY STREET,10006,1
-cac3f0fec7eaabb77c20dea554774301,e_rashad_divya_278_VAN,rashad_divya @ 278_VAN,DIVYA RASHAD,278,VAN DUZER STREET,10304,2
-5923b291daeced2e147466ced71b4a9e,e_rashad_divya_38_GRAMER,rashad_divya @ 38_GRAMER,DIVYA RASHAD,38,GRAMERCY PARK EAST,10010,1
-30ac3cc07526572adafad4b35a24afb5,e_rashad_divya_56_EAST,rashad_divya @ 56_EAST,DIVYA RASHAD,56,EAST 87TH STREET,10128,1
-e172bbcbbfe5a1ddb7307f7e1d49fbd4,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,666TH BROADWAY,10012,1
-ca8b996b97a20df15d7198921791b861,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,666TH BROADWAY,10012,1
-327333ee48c18d7bc0ce6b9b39e129a2,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADAWAY,10012,1
-489192c7cccda447c954d7223200d758,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10002,1
-e3db23523c27e0146d7ad62f41a387ed,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10003,1
-9140f269d92929debb8fe2d89e8fb693,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10011,1
-b0f788ea64bc1a6f9cbd607d61488196,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10012,69
-87dd6e441ec802f3d088a3d5be41df33,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10013,1
-f7959c2eb682a08ace29c4239cff2b05,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10024,1
-0105a27f04396d08f1ccd4f154cc3193,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10013,1
-5d672a34af1a51e8dc1c997ba7ac8c90,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10012,6
-099d3387505a9fde0d363957bd698696,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10013,1
-4e60304c7e09525da3be8adb69be46fb,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10011,1
-aff3239a775647ea687f206e4a033bc3,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10012,125
-ce5495862a01fcce70996308278024e1,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10012,1
-186e13611b319643366f340f21b9b715,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY,10012,4
-f28e3c1d126f25c7d9dd9e3d37add910,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY  12TH FL,10012,1
-6b30bd5aae739d0f077c5b3211d5139b,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWAY  12TH FL,10012,2
-6fe3a668ea88270997f853e2bd6259b2,e_rashad_divya_666bway,rashad_divya @ 666bway,DIVYA RASHAD,666,BROADWQAY,10012,1
-d2c01c7ac33dbbf431674e22a96960e2,e_rashad_jamal_278_VAN,rashad_jamal @ 278_VAN,JAMAL RASHAD,278,VAN DUZER STEET,10304,2
+fc80100f0b3fa2ced81b2500847791d2,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,106,SPRING STREET,10012,1
+cad668db70062e4b071cb936c1d47d1c,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,114,LIBERTY STREET,10006,1
+cac3f0fec7eaabb77c20dea554774301,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,278,VAN DUZER STREET,10304,2
+5923b291daeced2e147466ced71b4a9e,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,38,GRAMERCY PARK EAST,10010,1
+30ac3cc07526572adafad4b35a24afb5,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,56,EAST 87TH STREET,10128,1
+e172bbcbbfe5a1ddb7307f7e1d49fbd4,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,666TH BROADWAY,10012,1
+ca8b996b97a20df15d7198921791b861,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,666TH BROADWAY,10012,1
+327333ee48c18d7bc0ce6b9b39e129a2,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADAWAY,10012,1
+489192c7cccda447c954d7223200d758,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10002,1
+e3db23523c27e0146d7ad62f41a387ed,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10003,1
+9140f269d92929debb8fe2d89e8fb693,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10011,1
+b0f788ea64bc1a6f9cbd607d61488196,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10012,69
+87dd6e441ec802f3d088a3d5be41df33,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10013,1
+f7959c2eb682a08ace29c4239cff2b05,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10024,1
+0105a27f04396d08f1ccd4f154cc3193,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10013,1
+5d672a34af1a51e8dc1c997ba7ac8c90,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10012,6
+099d3387505a9fde0d363957bd698696,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10013,1
+4e60304c7e09525da3be8adb69be46fb,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10011,1
+aff3239a775647ea687f206e4a033bc3,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10012,125
+ce5495862a01fcce70996308278024e1,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10012,1
+186e13611b319643366f340f21b9b715,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY,10012,4
+f28e3c1d126f25c7d9dd9e3d37add910,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY  12TH FL,10012,1
+6b30bd5aae739d0f077c5b3211d5139b,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWAY  12TH FL,10012,2
+6fe3a668ea88270997f853e2bd6259b2,e_rashad_divya,rashad_divya (one operator — offices merged),DIVYA RASHAD,666,BROADWQAY,10012,1
+d2c01c7ac33dbbf431674e22a96960e2,e_rashad_jamal,rashad_jamal (one operator — offices merged),JAMAL RASHAD,278,VAN DUZER STEET,10304,2

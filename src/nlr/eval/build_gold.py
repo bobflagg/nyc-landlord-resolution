@@ -94,24 +94,26 @@ def adjudicate(r) -> tuple[str, str]:
         key = f"{house}_{ln}_{fn}".lower().replace(" ", "_")
         return f"e_office_{key}", f"office-mate @ {house} spencer (must-NOT-merge)"
     ok = office_key(ln, r.biz_house, r.biz_street)
-    # CROMAN / KADDEN: collapse first-name variants (STEVE/STEVEN, ZACH/ZACHARY) —
-    # one person, offices separate. RASHAD / CASTELLANO: keep first names distinct.
+    # OWNER-LEVEL adjudication: the four target families are labeled per OWNER, not per
+    # office. Same last name + same first name across offices = one operator — supported by
+    # ACRIS multi-parcel co-ownership + a shared private corp (evidence pulled when flipped).
+    # First names stay distinct, so genuinely different people (ANDREA vs SCOTT CASTELLANO,
+    # DIVYA vs JAMAL RASHAD) remain separate. Was office-separate for Kadden/Rashad/Castellano
+    # (the earlier "[DEBATABLE]" choice); flipped with evidence. `office_key`/`ok` now unused.
     if ln == "CROMAN":
-        # Croman is a known single operator (AG case, one person) — merge all his
-        # offices. Castellano/Kadden stay office-separate: genuinely uncertain.
         return "e_croman", "croman (one operator — all offices merged)"
     if ln == "KADDEN":
-        return f"e_kadden_{ok}", f"kadden @ {ok} (same-office must-merge)"
+        # Zach/Zachary Kadden — one person; all offices merged.
+        return "e_kadden", "kadden (one operator — offices merged)"
     if ln == "RASHAD":
         who = "divya" if fn.startswith("DIVYA") else ("jamal" if fn.startswith("JAMAL") else fn.lower())
-        return f"e_rashad_{who}_{ok}", f"rashad_{who} @ {ok}"
+        return f"e_rashad_{who}", f"rashad_{who} (one operator — offices merged)"
     if ln == "CASTELLANO":
         if fn == "SCOTT":
-            # Choice NY Management (private, 8 landlords) bridges his 22 W 21 and
-            # 254 W 31 offices across 40 buildings -> one operator (evidence, not the
-            # model): the loop surfaced this; verified independently.
+            # Choice NY Management (private, 8 landlords) bridges his 22 W 21 and 254 W 31
+            # offices across 40 buildings — one operator (verified independently).
             return "e_castellano_scott", "castellano_scott (one operator — corp-bridged offices)"
-        return f"e_castellano_{fn.lower()}_{ok}", f"castellano_{fn.lower()} @ {ok}"
+        return f"e_castellano_{fn.lower()}", f"castellano_{fn.lower()} (one operator — offices merged)"
     # Decoys keyed on the person, so a decoy's own duplicate records are one entity.
     return f"e_nbr_{fn}_{ln}", "aggregator_neighbour (must-NOT-merge)"
 
