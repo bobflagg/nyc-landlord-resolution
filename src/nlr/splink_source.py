@@ -492,14 +492,39 @@ def corp_owners_for(conn, bbls=None) -> pd.DataFrame:
     (bbl, corp). E.g. CENTENNIAL PROPERTIES NY spans all of Croman's offices, so his
     740 Broadway and 424 W 51 entities share it. Pass ``bbls`` to scope to a set of
     buildings (an eval slice); pass ``None`` for every building (the full run — far
-    cheaper than shipping a 170k-element array as a query parameter)."""
+    cheaper than shipping a 170k-element array as a query parameter).
+
+    Dialect-dispatched like the other reads: the ``bbls=None`` path and DuckDB go through
+    ``_read`` (btrim->trim); the Postgres ``bbls`` path keeps the ``= ANY(%(bbls)s)`` param,
+    while DuckDB inlines the (internal, numeric) bbl list as an IN clause."""
     base = ("SELECT DISTINCT btrim(r.bbl) AS bbl, upper(btrim(c.corporationname)) AS corp "
             "FROM hpd_contacts c JOIN hpd_registrations r ON r.registrationid = c.registrationid "
             "WHERE c.corporationname IS NOT NULL AND length(btrim(c.corporationname)) > 3")
     if bbls is None:
-        return pd.read_sql(base + " AND r.bbl IS NOT NULL", conn)
+        return _read(conn, base + " AND r.bbl IS NOT NULL")
+    if _is_duckdb(conn):
+        bbls = list(bbls)
+        if not bbls:
+            return _read(conn, base + " AND FALSE")
+        inlist = ",".join("'" + str(b).replace("'", "''") + "'" for b in bbls)
+        return _read(conn, base + f" AND btrim(r.bbl) IN ({inlist})")
     return pd.read_sql(base + " AND btrim(r.bbl) = ANY(%(bbls)s)", conn,
                        params={"bbls": list(bbls)})
+
+
+# First-name compatibility for the feedback loop, mirroring cluster_gated's first-name veto
+# at the entity level. Two same-surname entities that share a corp are still DIFFERENT people
+# if their first names genuinely disagree. Compatible when either is missing or the names are
+# similar (difflib ratio >= this) — keeps STEVE/STEVEN, ZACH/ZACHARY and typo variants; rejects
+# JACOB/JOSEF, ANDREA/FILIPPO.
+FIRST_NAME_SIM = 0.7
+
+
+def _first_name_compatible(a, b) -> bool:
+    import difflib
+    if not a or not b or a == b:
+        return True
+    return difflib.SequenceMatcher(None, a, b).ratio() >= FIRST_NAME_SIM
 
 
 def feedback_merge(df: pd.DataFrame, clusters: pd.DataFrame, corp_df: pd.DataFrame,
@@ -508,7 +533,7 @@ def feedback_merge(df: pd.DataFrame, clusters: pd.DataFrame, corp_df: pd.DataFra
     """One feedback-loop pass: merge pass-1 entities that are name-compatible
     (same last name + first initial) AND share a corporate co-owner across their
     buildings. This bridges the cross-office splits name+address alone can't
-    (Croman's 740 Broadway <-> 424 W 51, via Centennial Properties). Two guards:
+    (Croman's 740 Broadway <-> 424 W 51, via Centennial Properties). Three guards:
 
       * corp_cap — corps shared by more than this many distinct landlords
         (registered agents / big managers) are excluded (aggregator-corp cap).
@@ -516,6 +541,9 @@ def feedback_merge(df: pd.DataFrame, clusters: pd.DataFrame, corp_df: pd.DataFra
         bridged. A shared corp is often just a third-party MANAGER; for a rare name
         (Croman ~8) the pair is still surely one person, but for a common one
         (Smith 25, Chen 232) it isn't — so common names are never corp-bridged.
+      * first-name veto — two same-surname entities sharing a corp are still
+        different people if their first names genuinely disagree (JACOB vs JOSEF
+        GUTMAN). Mirrors cluster_gated's first-name veto at the entity level.
 
     Returns the clusters frame with a re-mapped ``cluster_id``."""
     from collections import defaultdict
@@ -528,18 +556,22 @@ def feedback_merge(df: pd.DataFrame, clusters: pd.DataFrame, corp_df: pd.DataFra
         rare = set(map(tuple, name_freq.loc[name_freq["identities"] <= name_cap,
                                             ["last_name", "first_initial"]].to_numpy()))
     corp_by_bbl = corp_df.groupby("bbl")["corp"].apply(set).to_dict()
-    m = clusters[["unique_id", "cluster_id", "last_name", "first_initial"]].merge(
+    m = clusters[["unique_id", "cluster_id", "last_name", "first_initial", "first_name"]].merge(
         df[["unique_id", "bbls"]], on="unique_id")
 
     ent = {}
     for cid, g in m.groupby("cluster_id"):
-        bbls = {b for lst in g["bbls"] for b in (lst or [])}
+        # `lst if lst is not None` (not `lst or`) — DuckDB returns bbls as numpy arrays,
+        # whose truth value is ambiguous; Postgres returns plain lists.
+        bbls = {b for lst in g["bbls"] for b in (lst if lst is not None else [])}
         corps = set().union(*(corp_by_bbl.get(b, set()) for b in bbls)) if bbls else set()
         last = g["last_name"].mode()
         init = g["first_initial"].mode()
+        first = g["first_name"].mode()
         ent[cid] = {"corps": corps,
                     "last": last.iloc[0] if len(last) else None,
-                    "init": init.iloc[0] if len(init) else None}
+                    "init": init.iloc[0] if len(init) else None,
+                    "first": first.iloc[0] if len(first) else None}
 
     parent = {cid: cid for cid in ent}
     def find(x):
@@ -557,7 +589,8 @@ def feedback_merge(df: pd.DataFrame, clusters: pd.DataFrame, corp_df: pd.DataFra
             continue                         # common name — never corp-bridge
         for i in range(len(ids)):
             for j in range(i + 1, len(ids)):
-                if ent[ids[i]]["corps"] & ent[ids[j]]["corps"]:
+                if (ent[ids[i]]["corps"] & ent[ids[j]]["corps"]) and \
+                        _first_name_compatible(ent[ids[i]]["first"], ent[ids[j]]["first"]):
                     parent[find(ids[i])] = find(ids[j])
 
     remap = {cid: find(cid) for cid in ent}

@@ -47,7 +47,7 @@ def _stratified_train(full: pd.DataFrame) -> pd.DataFrame:
     return full[pd.Series(keep, index=full.index)].reset_index(drop=True)
 
 
-def owner_index(conn, *, threshold: float = DEFAULT_THRESHOLD) -> dict:
+def owner_index(conn, *, threshold: float = DEFAULT_THRESHOLD, feedback: bool = True) -> dict:
     """``{(normalized name, bbl): owner_id}`` for every person owner-contact in the HPD data.
 
     ``owner_id`` is opaque and stable WITHIN one call (EM is stochastic → not stable across
@@ -64,10 +64,19 @@ def owner_index(conn, *, threshold: float = DEFAULT_THRESHOLD) -> dict:
     name_freq = ss.name_freq(conn)       # (surname, first-initial) rarity → common-name veto
 
     # 3. resolve: train on the slice, predict over the full pop, cluster with both vetoes
-    #    (name-anchored blocking + first-name veto + common-name veto). No feedback loop —
-    #    at full scale term-frequency subsumes it.
+    #    (name-anchored blocking + first-name veto + common-name veto).
     linker, preds = ss.fit_predict_full(train, full, addr_degrees=degrees)
     clusters = ss.cluster_gated(preds, full, threshold, name_freq=name_freq)
+
+    # 3b. feedback loop: bridge same-owner offices that share a private corporate co-owner —
+    #     the cross-office consolidation name/address can't reach (Croman via Centennial
+    #     Properties, Rashad via The Andrews Organization). Guarded by corp-degree cap +
+    #     name-rarity + first-name veto; validated precision-safe against the owner-level gold
+    #     (P 1.0, 0 cross-surname) for a ~+30pt recall lift. Pass feedback=False to skip it.
+    if feedback:
+        corp_df = ss.corp_owners_for(conn)     # (bbl, corp) over all buildings
+        corp_deg = ss.corp_degrees(conn)       # corp -> distinct-landlord degree (aggregator cap)
+        clusters = ss.feedback_merge(full, clusters, corp_df, corp_deg, name_freq=name_freq)
 
     # 4. explode each entity to its (name, bbl) pairs → owner_id
     m = (clusters[["unique_id", "cluster_id"]]
