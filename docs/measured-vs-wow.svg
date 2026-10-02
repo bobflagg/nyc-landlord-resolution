@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 452" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <style>
+      .teal { fill: #1b7d6e; }
+      .rust { fill: #b8431f; }
+      .big  { font-weight: 800; letter-spacing: -0.02em; }
+      .lbl  { fill: #51605a; font-weight: 700; }
+      .mut  { fill: #8a988f; font-weight: 700; }
+      .body { fill: #2b3a35; font-weight: 400; }
+      .bold { fill: #2b3a35; font-weight: 800; }
+      .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <!-- card -->
+  <rect x="6" y="6" width="988" height="440" rx="18" fill="#ffffff" stroke="#e3e8e6" stroke-width="2"/>
+
+  <!-- hero numbers -->
+  <text x="48"  y="150" class="big teal" font-size="104">64</text>
+  <text x="205" y="118" class="lbl" font-size="21">new resolver</text>
+  <text x="205" y="146" class="lbl" font-size="21">correct</text>
+  <text x="360" y="140" class="mut" font-size="30">vs</text>
+  <text x="430" y="150" class="big rust" font-size="104">3</text>
+  <text x="508" y="118" class="lbl" font-size="21">JustFix</text>
+  <text x="508" y="146" class="lbl" font-size="21">correct</text>
+
+  <!-- sentence -->
+  <text x="48" y="222" class="body" font-size="26">On the <tspan class="bold">67 model-frame pairs where splink and JustFix disagree,</tspan> the new</text>
+  <text x="48" y="258" class="body" font-size="26">resolver is right 64 times and JustFix 3 times — a McNemar test</text>
+  <text x="48" y="294" class="body" font-size="26">rejects parity at <tspan class="bold">p &lt; 0.001</tspan>.</text>
+
+  <!-- stacked bar (64/67 = 95.5% teal, 3/67 = 4.5% rust) -->
+  <g>
+    <rect x="48" y="320" width="864" height="26" rx="6" class="rust"/>
+    <rect x="48" y="320" width="825" height="26" rx="6" class="teal"/>
+  </g>
+
+  <!-- legend -->
+  <g class="mono" font-size="18">
+    <rect x="48" y="366" width="15" height="15" rx="3" class="teal"/>
+    <text x="72" y="379" class="lbl">New resolver correct · 64 (96%)</text>
+    <rect x="430" y="366" width="15" height="15" rx="3" class="rust"/>
+    <text x="454" y="379" class="lbl">JustFix correct · 3 (4%)</text>
+  </g>
+
+  <!-- stat tiles -->
+  <g>
+    <rect x="48"  y="398" width="212" height="40" rx="8" fill="#f1f4f2"/>
+    <rect x="272" y="398" width="212" height="40" rx="8" fill="#f1f4f2"/>
+    <rect x="496" y="398" width="212" height="40" rx="8" fill="#f1f4f2"/>
+    <rect x="720" y="398" width="224" height="40" rx="8" fill="#f1f4f2"/>
+    <text x="64"  y="416" class="bold" font-size="17">150</text>
+    <text x="108" y="416" class="mono" font-size="12" fill="#8a988f">splink merges</text>
+    <text x="64"  y="431" class="mono" font-size="12" fill="#8a988f">sampled (model frame)</text>
+    <text x="288" y="416" class="bold" font-size="17">67</text>
+    <text x="322" y="416" class="mono" font-size="12" fill="#8a988f">disagree with</text>
+    <text x="288" y="431" class="mono" font-size="12" fill="#8a988f">JustFix</text>
+    <text x="512" y="416" class="bold" font-size="17">96.7%</text>
+    <text x="586" y="416" class="mono" font-size="12" fill="#8a988f">merge precision</text>
+    <text x="512" y="431" class="mono" font-size="12" fill="#8a988f">Wilson 92–99%</text>
+    <text x="736" y="416" class="bold" font-size="17">p &lt; 0.001</text>
+    <text x="840" y="416" class="mono" font-size="12" fill="#8a988f">McNemar</text>
+    <text x="736" y="431" class="mono" font-size="12" fill="#8a988f">(two-sided)</text>
+  </g>
+</svg>

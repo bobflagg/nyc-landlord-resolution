@@ -113,6 +113,9 @@ evaluation measures the thing that matters for the integration: **when this engi
 "same owner" edge, how often is it right, and how many real false-splits does it fix that WoW
 leaves fragmented?**
 
+![Head-to-head on the model frame: on the 67 sampled splink merges where splink and JustFix
+disagree, splink is right 64 times and JustFix 3 — McNemar p < 0.001.](docs/measured-vs-wow.svg)
+
 The test is a **preregistered, blinded, hand-adjudicated** stratified sample of the
 model-linkage frame — the 11,742 candidate pairs splink scores but WoW's name/address
 clustering does not already merge. 150 pairs were drawn, labeled blind by a human adjudicator
