@@ -35,8 +35,8 @@
 <div class="card">
   <h1>One owner, scattered across the record<small>Steven Croman · 127 buildings · Resolved = 1 owner · Who Owns What = 6 portfolios</small></h1>
   <div class="toggle">
-    <button id="b-wl" class="on" onclick="setView('wl')">Resolved</button>
-    <button id="b-wow" onclick="setView('wow')">Who Owns What</button>
+    <button id="b-wow" class="on" onclick="setView('wow')">Who Owns What</button>
+    <button id="b-wl" onclick="setView('wl')">Resolved</button>
   </div>
   <div class="legend" id="legend"></div>
   <div class="note"><b>These groupings are algorithmic inferences from public records — leads to verify, not determinations of legal ownership. Data as of 2026-09-19.</b><br>Resolution: <code>nyc-landlord-resolution</code> (Splink / Fellegi-Sunter) over HPD registrations.
@@ -52,7 +52,7 @@ const LEGEND = {wl: `<div class="row"><span class="dot" style="background:#2563e
 <div class="row"><span class="dot" style="background:#059669"></span>WoW #87347 · 1 bldgs · split-off<br><span class="nm">STEVEN CROMAN</span><br><span class="addr">4 WEST 51 STREET GF, MANHATTAN NY</span></div>
 <div class="row"><span class="dot" style="background:#7c3aed"></span>WoW #87346 · 1 bldgs · split-off<br><span class="nm">STEVEN CROMAN</span><br><span class="addr">424 WEST 22 STREET GROUND, MANHATTAN NY</span></div>
 <div class="row"><span class="dot" style="background:#0891b2"></span>WoW #46233 · 1 bldgs · split-off<br><span class="nm">STEVEN CROMAN</span><br><span class="addr">632 BROADWAY 7 FL, MANHATTAN NY</span></div>`};
-const DEFAULT_VIEW = "wl";   // which view opens first: "wl" (single) or "wow" (split)
+const DEFAULT_VIEW = "wow";   // which view opens first: "wl" (single) or "wow" (split)
 
 const map = new maplibregl.Map({
   container: "map",
