@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antonelli portfolio · NYC Landlord Resolution</title>
+<link href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  :root{--ink:#1a2129;--soft:#5b6570;--line:#d9ddd6;--panel:#fff;}
+  html,body{margin:0;height:100%;font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);}
+  #map{position:absolute;inset:0;}
+  .card{position:absolute;top:12px;left:12px;z-index:2;background:var(--panel);border:1px solid var(--line);
+        border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.12);max-width:320px;overflow:hidden;}
+  .card h1{font-size:.95rem;margin:0;padding:11px 14px;border-bottom:1px solid var(--line);}
+  .card h1 small{display:block;color:var(--soft);font-weight:400;font-size:.72rem;margin-top:2px;}
+  .toggle{display:flex;padding:10px 14px 6px;gap:8px;}
+  .toggle button{flex:1;font:inherit;font-size:.8rem;padding:7px 4px;border:1px solid var(--line);
+        background:#f6f7f4;color:var(--ink);border-radius:6px;cursor:pointer;}
+  .toggle button.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600;}
+  .legend{padding:4px 14px 12px;max-height:46vh;overflow-y:auto;}
+  .legend .row{font-size:.78rem;margin:8px 0;padding-left:20px;position:relative;color:var(--ink);}
+  .legend .dot{position:absolute;left:0;top:2px;width:12px;height:12px;border-radius:50%;
+        border:1px solid rgba(0,0,0,.35);}
+  .legend .nm{color:var(--ink);font-weight:600;}
+  .legend .addr{color:var(--soft);font-family:ui-monospace,monospace;font-size:.72rem;}
+  .note{padding:0 14px 12px;font-size:.72rem;color:var(--soft);}
+  .maplibregl-popup-content{font:13px/1.4 -apple-system,sans-serif;padding:9px 12px;border-radius:7px;
+        box-shadow:0 2px 10px rgba(0,0,0,.18);}
+  .maplibregl-popup-content b{font-size:.85rem;}
+  .pp{color:#5b6570;font-family:ui-monospace,monospace;font-size:.72rem;}
+  .tip .mrow{margin-top:4px;font-size:.78rem;color:var(--ink);}
+  .tip .tag{background:var(--flag,#b23a2e);color:#fff;font-size:.66rem;padding:1px 5px;border-radius:3px;}
+</style></head>
+<body>
+<div id="map"></div>
+<div class="card">
+  <h1>One owner, scattered across the record<small>Domenico Antonelli · 10 buildings · Resolved = 1 owner · Who Owns What = 9 portfolios</small></h1>
+  <div class="toggle">
+    <button id="b-wow" class="on" onclick="setView('wow')">Who Owns What</button>
+    <button id="b-wl" onclick="setView('wl')">Resolved</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="note"><b>These groupings are algorithmic inferences from public records — leads to verify, not determinations of legal ownership. Data as of 2026-09-19.</b><br>Resolution: <code>nyc-landlord-resolution</code> (Splink / Fellegi-Sunter) over HPD registrations.
+    Coordinates: NYC DOF/PLUTO. WoW assignment: justfix <code>wow.wow_portfolios</code>. Base map tiles © Esri.</div>
+</div>
+<script>
+const DATA = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8246812, 40.7788734]}, "properties": {"bbl": "4042200050", "address": "143-35 22 ROAD", "bldgclass": "B1", "units": 2, "year": 1965, "owner": "XIE, QIYANG", "officer": "DOMENICO ANTONELLI", "bizaddr": "150-115 POWELLS COW B , WHITESTONE NY 11357", "wow_pf": "25794", "wow_color": "#dc2626", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8199358, 40.7912009]}, "properties": {"bbl": "4044780001", "address": "10-03 147 STREET", "bldgclass": "B3", "units": 2, "year": 1950, "owner": "DOMENICO ANTONELLI", "officer": "Domenico Antonelli", "bizaddr": "10-03 147TH STREET , Whitestone NY 11357", "wow_pf": "25789", "wow_color": "#d97706", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8153994, 40.7770721]}, "properties": {"bbl": "4046750036", "address": "149-57 WILLETS POINT BLVD", "bldgclass": "C0", "units": 3, "year": 1960, "owner": "SHI, QIFENG", "officer": "DOMENICO ANTONELLI", "bizaddr": "150-115 POWELLS COVE BOULEVARD , WHITESTONE NY 11357", "wow_pf": "25793", "wow_color": "#2563eb", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8123215, 40.7802043]}, "properties": {"bbl": "4046900028", "address": "150-56 20 ROAD", "bldgclass": "B2", "units": 2, "year": 1955, "owner": "DOMINICO ANTONELLI", "officer": "Domenico Antonelli", "bizaddr": "15056 20TH ROAD , Whitestone NY 11357", "wow_pf": "25795", "wow_color": "#059669", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.808784, 40.7785791]}, "properties": {"bbl": "4047380003", "address": "21-27 154 STREET", "bldgclass": "A2", "units": 1, "year": 1955, "owner": "ANTONELLI, DOMENICO", "officer": "Domenico Antonelli", "bizaddr": "21-27 154TH STREET , Whitestone NY 11357", "wow_pf": "25796", "wow_color": "#7c3aed", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8207598, 40.7735618]}, "properties": {"bbl": "4047940019", "address": "146-28 27 AVENUE", "bldgclass": "B2", "units": 2, "year": 1960, "owner": "ANTONELLI DOMENICO", "officer": "Domenico Antonelli", "bizaddr": "146-28 27TH AVENUE , Flushing NY 11354", "wow_pf": "25790", "wow_color": "#0891b2", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8199999, 40.7728442]}, "properties": {"bbl": "4047950028", "address": "146-48 28 AVENUE", "bldgclass": "B2", "units": 2, "year": 1960, "owner": "ANTONELLI DOMENICO", "officer": "Domenico Antonelli", "bizaddr": "14648 28TH AVENUE , Flushing NY 11354", "wow_pf": "25791", "wow_color": "#db2777", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8198375, 40.7728439]}, "properties": {"bbl": "4047950029", "address": "146-52 28 AVENUE", "bldgclass": "B2", "units": 2, "year": 1960, "owner": "ANTONELLI DOMENICO", "officer": "Domenico Antonelli", "bizaddr": "14652 28TH AVENUE , Flushing NY 11354", "wow_pf": "25792", "wow_color": "#65a30d", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.8011503, 40.7775781]}, "properties": {"bbl": "4048790007", "address": "21-48 FRANCIS LEWIS BLVD", "bldgclass": "B2", "units": 2, "year": 1960, "owner": "ANTONELLI DOMENICO", "officer": "Domenico Antonelli", "bizaddr": "21-48 FRANCIS LEWIS BOULEVARD , Whitestone NY 11357", "wow_pf": "25797", "wow_color": "#ea580c", "stray": false, "flagged": false, "flag_note": ""}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.7929168, 40.786086]}, "properties": {"bbl": "4057750015", "address": "15-03 201 STREET", "bldgclass": "B1", "units": 2, "year": 1965, "owner": "ZHANG, NAN", "officer": "DOMENICO ANTONELLI", "bizaddr": "150-115 POWELLS COVE BOULEVARD , WHITESTONE NY 11357", "wow_pf": "25793", "wow_color": "#2563eb", "stray": false, "flagged": false, "flag_note": ""}}]};
+const WL_COLOR = "#2563eb";
+const FLAG_FILL = "#eef0f3", FLAG_STROKE = "#7a8595";   // context-only buildings (in neither system)
+const LEGEND = {wl: `<div class="row"><span class="dot" style="background:#2563eb"></span>Resolved: one owner · 10 buildings<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">one Queens operator, scattered by address typos</span></div>`, wow: `<div class="row"><span class="dot" style="background:#2563eb"></span>WoW #25793 · 2 bldg<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">150-115 POWELLS COVE BOULEVARD , WHITESTONE NY 11357</span></div>
+<div class="row"><span class="dot" style="background:#dc2626"></span>WoW #25794 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">150-115 POWELLS COW B , WHITESTONE NY 11357</span></div>
+<div class="row"><span class="dot" style="background:#d97706"></span>WoW #25789 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">10-03 147TH STREET , Whitestone NY 11357</span></div>
+<div class="row"><span class="dot" style="background:#059669"></span>WoW #25795 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">15056 20TH ROAD , Whitestone NY 11357</span></div>
+<div class="row"><span class="dot" style="background:#7c3aed"></span>WoW #25796 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">21-27 154TH STREET , Whitestone NY 11357</span></div>
+<div class="row"><span class="dot" style="background:#0891b2"></span>WoW #25790 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">146-28 27TH AVENUE , Flushing NY 11354</span></div>
+<div class="row"><span class="dot" style="background:#db2777"></span>WoW #25791 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">14648 28TH AVENUE , Flushing NY 11354</span></div>
+<div class="row"><span class="dot" style="background:#65a30d"></span>WoW #25792 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">14652 28TH AVENUE , Flushing NY 11354</span></div>
+<div class="row"><span class="dot" style="background:#ea580c"></span>WoW #25797 · 1 bldg · split-off<br><span class="nm">DOMENICO ANTONELLI</span><br><span class="addr">21-48 FRANCIS LEWIS BOULEVARD , Whitestone NY 11357</span></div>`};
+const DEFAULT_VIEW = "wow";   // which view opens first: "wl" (single) or "wow" (split)
+
+const map = new maplibregl.Map({
+  container: "map",
+  style: {version: 8, sources: {"esribase": {"type": "raster", "tileSize": 256, "maxzoom": 16, "tiles": ["https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"], "attribution": "Tiles \u00a9 Esri \u2014 Esri, HERE, Garmin, \u00a9 OpenStreetMap contributors"}, "esriref": {"type": "raster", "tileSize": 256, "maxzoom": 16, "tiles": ["https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"]}}, layers: [{"id": "esribase", "type": "raster", "source": "esribase"}, {"id": "esriref", "type": "raster", "source": "esriref"}]},
+  center:[-73.9,40.84], zoom:11
+});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}), "top-right");
+
+function setView(v){
+  document.getElementById("b-wl").classList.toggle("on", v==="wl");
+  document.getElementById("b-wow").classList.toggle("on", v==="wow");
+  document.getElementById("legend").innerHTML = LEGEND[v];
+  const base = v==="wl" ? WL_COLOR : ["get","wow_color"];
+  const color = ["case",["get","flagged"], FLAG_FILL, base];
+  const radius = v==="wow"
+    ? ["interpolate",["linear"],["zoom"], 10,["case",["get","stray"],7,5], 15,["case",["get","stray"],13,9]]
+    : ["interpolate",["linear"],["zoom"], 10,5, 15,9];
+  const stroke = ["case",["get","flagged"],2.4, (v==="wow" ? ["case",["get","stray"],2.2,1] : 1)];
+  map.setPaintProperty("pts","circle-color",color);
+  map.setPaintProperty("pts","circle-radius",radius);
+  map.setPaintProperty("pts","circle-stroke-width",stroke);
+  map.setPaintProperty("pts","circle-stroke-color",["case",["get","flagged"], FLAG_STROKE, "#fff"]);
+}
+
+map.on("load", ()=>{
+  map.addSource("pts",{type:"geojson",data:DATA});
+  map.addLayer({id:"pts",type:"circle",source:"pts",
+    paint:{"circle-color":WL_COLOR,"circle-radius":6,
+           "circle-stroke-width":1,"circle-stroke-color":"#fff","circle-opacity":.92}});
+  // fit to all buildings
+  const b = new maplibregl.LngLatBounds();
+  DATA.features.forEach(f=>b.extend(f.geometry.coordinates));
+  if(!b.isEmpty()) map.fitBounds(b,{padding:70,maxZoom:15});
+  setView(DEFAULT_VIEW);   // paints + legend + button state for the opening view
+
+  // Hover tooltip with building details.
+  const tip = new maplibregl.Popup({closeButton:false, closeOnClick:false, offset:12,
+                                    className:"tip", maxWidth:"280px"});
+  map.on("mousemove","pts",e=>{
+    map.getCanvas().style.cursor="pointer";
+    const p = e.features[0].properties;
+    const flagged = (p.flagged===true||p.flagged==="true");
+    const stray = (p.stray===true||p.stray==="true") ? ' <span class="tag">split-off</span>' : '';
+    const lastRow = flagged
+      ? `<div class="mrow" style="color:#7a8595">${p.flag_note}</div>`
+      : `<div class="mrow">WoW portfolio: ${p.wow_pf}${stray}</div>`;
+    tip.setLngLat(e.lngLat).setHTML(
+      `<b>${p.address}</b><br><span class="pp">BBL ${p.bbl}</span>`+
+      `<div class="mrow">class ${p.bldgclass} · ${p.units} res units · built ${p.year}</div>`+
+      `<div class="mrow">PLUTO owner: ${p.owner}</div>`+
+      `<div class="mrow">HPD head officer: ${p.officer}</div>`+
+      `<div class="mrow">Business addr: <span class="pp">${p.bizaddr}</span></div>`+
+      lastRow
+    ).addTo(map);
+  });
+  map.on("mouseleave","pts",()=>{map.getCanvas().style.cursor=""; tip.remove();});
+  window._mapReady = true;   // hook for headless PNG export
+});
+// resolves once the map has finished rendering (tiles + paint settled)
+window.mapIdle = () => new Promise(res => map.once("idle", res));
+</script>
+</body></html>

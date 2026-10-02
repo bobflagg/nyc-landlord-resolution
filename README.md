@@ -36,13 +36,15 @@ entrench the splits.
 `nyc-landlord-resolution` targets the false-split failure mode. Instead of matching on exact
 or near-exact fields, it resolves each owner *probabilistically* — Splink's Fellegi-Sunter
 model scores every candidate pair on name and address agreement, learning from the data how
-much a rare-surname match or a one-character address difference is worth. **Steven Croman**,
-who surfaces as ~12 contact identities across 6 offices (one office a `424 WEST 51` vs
-`4 WEST 51` typo away from another), resolves to a single entity of **127 buildings** — while
-two unrelated JIN CHENs at different addresses never merge.
+much a rare-surname match or a one-character address difference is worth. **Domenico
+Antonelli**, a Queens landlord whose 10 buildings are registered from a handful of offices, is
+shattered by WoW into **9 separate portfolios** — a single office, `150-115 POWELLS COVE
+BOULEVARD`, is also typed `150-115 POWELLS COW B`, a hyphen is dropped from `146-48`, and each
+variant spawns its own portfolio. This engine reunites all 10 into **one entity**, while two
+unrelated JIN CHENs at different addresses never merge.
 
-> **[→ See it on the map](https://bobflagg.github.io/nyc-landlord-resolution/maps/croman.html)** —
-> Croman's 127 buildings as one resolved owner, toggled against the 6 separate portfolios Who
+> **[→ See it on the map](https://bobflagg.github.io/nyc-landlord-resolution/maps/antonelli.html)** —
+> Antonelli's 10 buildings as one resolved owner, toggled against the 9 separate portfolios Who
 > Owns What splits him into.
 
 The engine is tuned to **never merge two different owners**, even at the cost of a little
