@@ -11,7 +11,7 @@ buildings looks like a dozen small landlords, or an innocent namesake is saddled
 else's violations. Accurate portfolio identification is what turns scattered public records
 into a tool for accountability.
 
-## Who Owns What — the gold standard, and its two blind spots
+## Who Owns What
 
 JustFix's **[Who Owns What](https://github.com/JustFixNYC/who-owns-what)** (WoW) is the gold
 standard for this task. It models the city's landlords as a graph of registration contacts
@@ -31,7 +31,7 @@ The two errors pull in opposite directions, and fixing one naively worsens the o
 the matching to recover splits and you create merges; tighten it to avoid merges and you
 entrench the splits.
 
-## Fixing the first: false splits
+## Fixing false splits
 
 `nyc-landlord-resolution` targets the false-split failure mode. Instead of matching on exact
 or near-exact fields, it resolves each owner *probabilistically* — Splink's Fellegi-Sunter
@@ -173,7 +173,7 @@ uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headli
 > figures above cover the model (splink) stratum — this engine's contribution. Deed-based linkage
 > and the end-to-end head-to-head vs WoW belong to the broader Watchline system, not this library.
 
-## A follow-up — fixing the second: false merges
+## Fixing false merges
 
 The other failure mode — false merges, where WoW fuses distinct landlords who merely share an
 office — is the subject of a follow-up project,
