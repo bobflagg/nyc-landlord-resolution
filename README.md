@@ -106,6 +106,45 @@ address-nexus portfolios (a shell operation sharing one managing office) are pre
 an owner's scattered offices collapse into one. In a live run this consolidated ~7,476
 fragmented portfolios with zero namesake fusions.
 
+## Measured against Who Owns What
+
+The 105-record gold set above measures *internal* pairwise precision. A second, independent
+evaluation measures the thing that matters for the integration: **when this engine adds a
+"same owner" edge, how often is it right, and how many real false-splits does it fix that WoW
+leaves fragmented?**
+
+The test is a **preregistered, blinded, hand-adjudicated** stratified sample of the
+model-linkage frame — the 11,742 candidate pairs splink scores but WoW's name/address
+clustering does not already merge. 150 pairs were drawn, labeled blind by a human adjudicator
+(SAME / DIFFERENT / INDETERMINATE) against the primary record, and only then unblinded and
+scored against each pair's WoW decision.
+
+- **Precision: 96.7%** (145 / 150 correct merges; Wilson 95% CI 92–99%). Five false merges.
+- **64 of the 150** recover a split that WoW leaves fragmented (the two sides sit in separate
+  WoW portfolios) — net-new false-split fixes, not merges WoW already had.
+- Extrapolating the sample rate to the full frame: **≈5,000 WoW false-splits recovered** at
+  ~97% precision, across ~11,400 correct merges.
+- **Residual:** on a parallel sample of *unlinked* same-surname pairs, ~11% are in fact the
+  same owner — splink's precision-first vetoes still miss roughly **780** recoverable splits.
+  That is the cost of never fusing two different people.
+
+The headline is robust to who labels it: precision and the false-split count are **unchanged**
+when gold is restricted to a single human annotator (a second LLM reader agrees at κ = 0.89
+and is excluded from gold), so the result does not rest on any model's judgment.
+
+Reproduce it from the committed gold fixture — no database, no splink re-run:
+
+```bash
+uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headline above
+```
+
+> The gold is a frozen fixture (`nlr/eval/frame_gold.jsonl`): a blind, preregistered sample
+> adjudicated in the owner-review app and exported by `bor.eval.export_gold` against the
+> September 2026 HPD/ACRIS dump — provenance in `frame_gold.manifest.json`, full protocol and
+> population math in [docs/false-split-impact-metric.md](docs/false-split-impact-metric.md). The
+> figures above cover the model (splink) stratum — this engine's contribution. Deed-based linkage
+> and the end-to-end head-to-head vs WoW belong to the broader Watchline system, not this library.
+
 ## Status / roadmap
 
 - **Resolution engine + gold-set benchmark** over a Postgres holding the HPD tables.

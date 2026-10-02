@@ -1,0 +1,37 @@
+{
+  "frame": "accuracy-eval-4-strata",
+  "built_at": "2026-09-20",
+  "builder_commit": "c6c275e",
+  "bor_commit": "a96bfc6",
+  "owner_review_commit": "092147f",
+  "exported_at": "2026-10-02T00:42:44Z",
+  "gold_annotators": [
+    "bob"
+  ],
+  "gold_rule": "single-human",
+  "n_pairs": 512,
+  "n_disagreements": 0,
+  "wow_source": "wow.wow_portfolios (shared portfolio \u21d2 SAME)",
+  "per_stratum": {
+    "S1a_deed_held": {
+      "frame_size": 885,
+      "n_adjudicated": 70
+    },
+    "S1b_deed_linked_successor": {
+      "frame_size": 52,
+      "n_adjudicated": 52
+    },
+    "S2_model": {
+      "frame_size": 11742,
+      "n_adjudicated": 150
+    },
+    "S3_aggregator": {
+      "frame_size": 438,
+      "n_adjudicated": 120
+    },
+    "S4_hard_neg": {
+      "frame_size": 7083,
+      "n_adjudicated": 120
+    }
+  }
+}
