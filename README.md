@@ -1,4 +1,4 @@
-# nyc-landlord-resolution
+# NYC Landlord Resolution
 
 **Precision-first probabilistic resolution of NYC landlord/owner identities** from public
 HPD records. Given the raw owner contacts on HPD registrations, it decides *who is who* —
@@ -8,20 +8,55 @@ across separate "portfolios."
 Runs on the two HPD tables alone (`hpd_contacts`, `hpd_registrations`). **No knowledge
 graph, no geocoder.**
 
-## The problem
+## Why accurate landlord portfolios matter
 
-NYC landlord registrations fragment one operator across many records — typo'd names and
-business addresses, multiple offices, per-building shell LLCs. Matching that gates on exact
-or near-exact fields inherits the fragmentation: **Steven Croman shows as ~6 separate
-operators** because a business-address typo (`4 WEST 51` vs `424 WEST 51`) or a second
-office defeats the match. This library resolves the owner *probabilistically* (Splink /
-Fellegi-Sunter), so Croman's ~12 contact identities across 6 offices resolve to **one entity
-of 127 buildings** — while never fusing two different people.
+Knowing which buildings belong to the same landlord is the foundation of nearly every
+data-driven housing investigation in New York. Journalists tracing a negligent operator
+across the five boroughs, tenant organizers looking for others stuck with the same landlord,
+watchdog agencies trying to target the worst actors, and researchers measuring patterns of
+neglect all depend on it. Group a landlord's buildings correctly and a pattern — harassment,
+deferred repairs, speculative flipping — becomes visible across the whole portfolio; get the
+grouping wrong and accountability slips through the cracks: the operator with a hundred
+buildings looks like a dozen small landlords, or an innocent namesake is saddled with someone
+else's violations. Accurate portfolio identification is what turns scattered public records
+into a tool for accountability.
 
-## Precision-first, by design
+## Who Owns What — the gold standard, and its two blind spots
 
-The resolution is tuned so it **never merges two different owners**, even at the cost of a
-little recall:
+JustFix's **[Who Owns What](https://github.com/JustFixNYC/who-owns-what)** (WoW) is the gold
+standard for this task. It models the city's landlords as a graph of registration contacts
+linked by shared names and business addresses, then clusters that graph (WCC + Louvain) into
+portfolios — the backbone of countless tenant tools and news investigations. Because its
+links are name/address matches, it is strong and conservative, but it has two characteristic
+failure modes:
+
+- **False splits** — one landlord fractured into several portfolios. A business-address typo,
+  a second office, or a per-building shell LLC defeats the match, and an owner's own buildings
+  scatter across unrelated groups.
+- **False merges** — distinct landlords fused into one. A registered-agent office, a
+  management company, or a law firm's address is shared by many unrelated owners, and the
+  address link lumps them together.
+
+The two errors pull in opposite directions, and fixing one naively worsens the other: loosen
+the matching to recover splits and you create merges; tighten it to avoid merges and you
+entrench the splits.
+
+## Fixing the first: false splits
+
+`nyc-landlord-resolution` targets the false-split failure mode. Instead of matching on exact
+or near-exact fields, it resolves each owner *probabilistically* — Splink's Fellegi-Sunter
+model scores every candidate pair on name and address agreement, learning from the data how
+much a rare-surname match or a one-character address difference is worth. **Steven Croman**,
+who surfaces as ~12 contact identities across 6 offices (one office a `424 WEST 51` vs
+`4 WEST 51` typo away from another), resolves to a single entity of **127 buildings** — while
+two unrelated JIN CHENs at different addresses never merge.
+
+> **[→ See it on the map](https://bobflagg.github.io/nyc-landlord-resolution/maps/croman.html)** —
+> Croman's 127 buildings as one resolved owner, toggled against the 6 separate portfolios Who
+> Owns What splits him into.
+
+The engine is tuned to **never merge two different owners**, even at the cost of a little
+recall:
 
 - **Name-anchored blocking** — a surname match is required to even score a pair.
 - **First-name veto** — JACOB and JOSEF at one office are different people, not merged.
@@ -29,9 +64,33 @@ little recall:
 - **Aggregator-address masking** — a registered-agent office shared by many landlords is
   down-weighted, so office-mates aren't fused.
 
-Validated against a **105-record hand-adjudicated gold set** (`nlr/eval/gold_set.csv`):
-pairwise **P ≈ 0.996**, **zero namesake fusions**, and the fragmented operators
-consolidate.
+It drops into WoW **without changing its clustering at all** — it adds one high-confidence
+edge type:
+
+```python
+# resolve owners, then add a "same owner" edge between the graph nodes that resolve together
+owners = owner_index(conn)
+for owner, nodes in group_nodes_by_owner(graph, owners).items():
+    add_clique(graph, nodes, type="splink", weight=10.0)   # WCC/Louvain do the rest
+```
+
+Because edges only *add*, connected components only *merge*, never split: WoW's existing
+address-nexus portfolios (a shell operation sharing one managing office) are preserved, while
+an owner's scattered offices collapse into one. In a live run this consolidated **~7,476
+fragmented portfolios** with zero namesake fusions. (This is the record-linkage engine built
+for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**, extracted to stand on its own.)
+
+## How it measures up
+
+Validated against a **105-record hand-adjudicated gold set** (`nlr/eval/gold_set.csv`) —
+owner-contact records each labeled by hand to a true owner, scored pairwise and precision-first
+because a false merge (naming the wrong landlord) is the costly error: pairwise
+**precision ≈ 0.996**, **zero namesake fusions**, and the fragmented operators consolidate. The
+benchmark reproduces identically on either backend — Postgres or the offline DuckDB snapshot.
+
+That 105-record set measures *internal* precision; a second, blinded evaluation measures the
+fix **against WoW directly** — how often a splink merge is right and how many real false-splits
+it recovers. See [Measured against Who Owns What](#measured-against-who-owns-what) below.
 
 ## Use it
 
@@ -82,30 +141,6 @@ sample (every identity with a same-name peer), computed in pandas over the extra
 identically on both backends — so there is no cross-backend divergence (the earlier
 hash-sample caveat is gone).
 
-## Where it comes from — and the Who Owns What integration
-
-This is the record-linkage engine built for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**,
-extracted to stand on its own. It pairs naturally with JustFix's
-**[Who Owns What](https://github.com/JustFixNYC/who-owns-what)** (WoW): WoW already models
-portfolios as a graph of landlord nodes linked by name/address matches, then clusters them
-(WCC + Louvain). Its one blind spot is an owner's *own* typo'd/multi-office fragments — which
-is exactly what this engine resolves.
-
-The integration is deliberately tiny and **does not change WoW's clustering at all** — it
-adds one high-confidence edge type:
-
-```python
-# resolve owners, then add a "same owner" edge between the graph nodes that resolve together
-owners = owner_index(conn)
-for owner, nodes in group_nodes_by_owner(graph, owners).items():
-    add_clique(graph, nodes, type="splink", weight=10.0)   # WCC/Louvain do the rest
-```
-
-Because edges only *add*, connected components only *merge*, never split: WoW's existing
-address-nexus portfolios (a shell operation sharing one managing office) are preserved, while
-an owner's scattered offices collapse into one. In a live run this consolidated ~7,476
-fragmented portfolios with zero namesake fusions.
-
 ## Measured against Who Owns What
 
 The 105-record gold set above measures *internal* pairwise precision. A second, independent
@@ -147,6 +182,21 @@ uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headli
 > population math in [docs/false-split-impact-metric.md](docs/false-split-impact-metric.md). The
 > figures above cover the model (splink) stratum — this engine's contribution. Deed-based linkage
 > and the end-to-end head-to-head vs WoW belong to the broader Watchline system, not this library.
+
+## A follow-up — fixing the second: false merges
+
+The other failure mode — false merges, where WoW fuses distinct landlords who merely share an
+office — is the subject of a follow-up project,
+**[beneficial-ownership-resolution](https://github.com/bobflagg/beneficial-ownership-resolution)**
+("Watchline"). Where this engine asks *"are these the same name?"*, that one asks *"are these
+the same beneficial owner?"* — pulling in ACRIS deeds, NYS DOS filings, and LLM-adjudicated
+review to tell apart owners who only coincide at a registered-agent address, a managing agent,
+or a law office.
+
+On the same blind, preregistered 512-pair frame, its resolver beat WoW on **236 of the 259
+pairs where the two disagree** (McNemar p < 0.001; annotator κ = 0.89), and correctly **split
+~98%** of the pairs WoW groups only through a shared aggregator address. Between the two
+projects, both of WoW's blind spots are covered — false splits here, false merges there.
 
 ## Status / roadmap
 
