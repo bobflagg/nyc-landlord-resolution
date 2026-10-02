@@ -1,15 +1,5 @@
 # NYC Landlord Resolution
 
-**Precision-first probabilistic resolution of NYC landlord/owner identities** from public
-HPD records. Given the raw owner contacts on HPD registrations, it decides *who is who* —
-which records describe the same operator — so a single owner's buildings stop scattering
-across separate "portfolios."
-
-Runs on the two HPD tables alone (`hpd_contacts`, `hpd_registrations`). **No knowledge
-graph, no geocoder.**
-
-## Why accurate landlord portfolios matter
-
 Knowing which buildings belong to the same landlord is the foundation of nearly every
 data-driven housing investigation in New York. Journalists tracing a negligent operator
 across the five boroughs, tenant organizers looking for others stuck with the same landlord,
