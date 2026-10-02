@@ -84,6 +84,17 @@ That 105-record set measures *internal* precision; a second, blinded evaluation 
 fix **against WoW directly** — how often a splink merge is right and how many real false-splits
 it recovers. See [Measured against Who Owns What](#measured-against-who-owns-what) below.
 
+## How it works
+
+A step-by-step walkthrough of the resolution algorithm — following the arc of the official
+Splink tutorial — lives in **[How-it-works.ipynb](How-it-works.ipynb)**. It traces one landlord
+from raw HPD contacts through every stage: data prep and the name-anchored blocking rule, the
+exploratory look at name rarity and aggregator addresses, the Fellegi-Sunter model fit and its
+match-weight waterfall, the two precision vetoes and the corporate-co-owner feedback pass that
+reunites an owner's scattered offices, and finally the full-population `owner_index` scored
+against the gold set. It is the readable companion to the code — the *why* behind each
+precision decision.
+
 ## Use it
 
 ```python
