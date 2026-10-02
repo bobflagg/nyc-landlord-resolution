@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NYC Landlord Resolution</title>
+<meta name="description" content="Precision-first probabilistic resolution of NYC landlord/owner identities from public HPD records — fixing the false-split blind spot in Who Owns What.">
+<style>
+  :root{
+    --ink:#1a2129; --soft:#5b6570; --line:#e2e6e0; --panel:#fff; --bg:#f4f6f3;
+    --teal:#1b7d6e; --teal-ink:#0f5a4e; --rust:#b8431f; --chip:#eef2ef;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px;}
+  a{color:var(--teal-ink);}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.88em;
+       background:var(--chip);padding:.1em .4em;border-radius:4px;}
+
+  header{padding:64px 0 36px;border-bottom:1px solid var(--line);}
+  .eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);
+           font-weight:700;margin:0 0 10px;}
+  h1{font-size:clamp(2rem,6vw,3rem);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px;font-weight:800;}
+  .lede{font-size:1.18rem;color:var(--ink);max-width:62ch;margin:0 0 6px;}
+  .sub{color:var(--soft);max-width:62ch;margin:10px 0 0;font-size:1rem;}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+  .btn{display:inline-block;font-weight:600;text-decoration:none;padding:11px 18px;border-radius:8px;
+       font-size:.95rem;border:1px solid var(--teal);}
+  .btn.primary{background:var(--teal);color:#fff;}
+  .btn.ghost{background:transparent;color:var(--teal-ink);}
+
+  section{padding:40px 0;border-bottom:1px solid var(--line);}
+  h2{font-size:1.5rem;letter-spacing:-.01em;margin:0 0 16px;font-weight:800;}
+  p{margin:0 0 14px;}
+
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;}
+  .mode{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;}
+  .mode h3{margin:0 0 6px;font-size:1.05rem;}
+  .mode .tag{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+             padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px;}
+  .mode.split .tag{background:#e7f2ef;color:var(--teal-ink);}
+  .mode.merge .tag{background:#f6e7e1;color:var(--rust);}
+  .mode p{margin:0;color:var(--soft);font-size:.95rem;}
+  .mode .who{color:var(--ink);font-weight:600;font-size:.9rem;margin-top:10px;}
+
+  .mapcard{display:block;text-decoration:none;color:inherit;background:var(--panel);
+           border:1px solid var(--line);border-radius:12px;overflow:hidden;
+           box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s,transform .15s;}
+  .mapcard:hover{box-shadow:0 6px 20px rgba(0,0,0,.10);transform:translateY(-1px);}
+  .mapcard .body{padding:18px 22px;}
+  .mapcard .kicker{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+                   color:var(--teal);margin:0 0 6px;}
+  .mapcard h3{margin:0 0 6px;font-size:1.2rem;}
+  .mapcard p{margin:0;color:var(--soft);font-size:.95rem;}
+  .mapcard .go{color:var(--teal-ink);font-weight:600;font-size:.9rem;margin-top:10px;display:inline-block;}
+
+  figure{margin:0;}
+  figure img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:12px;background:#fff;}
+  figcaption{color:var(--soft);font-size:.86rem;margin-top:10px;}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
+  .stat .n{font-size:1.5rem;font-weight:800;letter-spacing:-.01em;color:var(--teal-ink);}
+  .stat .l{color:var(--soft);font-size:.85rem;margin-top:2px;}
+
+  footer{padding:30px 0 60px;color:var(--soft);font-size:.85rem;}
+  footer .note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--rust);
+               border-radius:8px;padding:12px 16px;margin-bottom:16px;color:var(--ink);}
+
+  @media (max-width:620px){
+    .modes{grid-template-columns:1fr;}
+    .stats{grid-template-columns:1fr;}
+    header{padding:48px 0 28px;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Public-records entity resolution</p>
+    <h1>NYC Landlord Resolution</h1>
+    <p class="lede">Precision-first probabilistic resolution of NYC landlord/owner identities
+      from public HPD records — so a single owner's buildings stop scattering across separate
+      &ldquo;portfolios.&rdquo;</p>
+    <p class="sub">Runs on the two HPD tables alone (<code>hpd_contacts</code>,
+      <code>hpd_registrations</code>). No knowledge graph, no geocoder.</p>
+    <div class="cta">
+      <a class="btn primary" href="maps/croman.html">Explore the Croman map →</a>
+      <a class="btn ghost" href="https://github.com/bobflagg/nyc-landlord-resolution">View on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Why it matters</h2>
+    <p>Knowing which buildings belong to the same landlord is the foundation of nearly every
+      data-driven housing investigation in New York — for journalists tracing a negligent
+      operator across the boroughs, tenant organizers finding others stuck with the same
+      landlord, and watchdog agencies targeting the worst actors. Group the buildings correctly
+      and a pattern becomes visible across the whole portfolio; get it wrong and accountability
+      slips through the cracks.</p>
+    <p>JustFix's <a href="https://github.com/JustFixNYC/who-owns-what">Who Owns What</a> is the
+      gold standard for this task — but because it links landlords by shared names and
+      addresses, it has two characteristic blind spots:</p>
+    <div class="modes">
+      <div class="mode split">
+        <span class="tag">False splits</span>
+        <h3>One owner, many portfolios</h3>
+        <p>A business-address typo, a second office, or a per-building shell LLC defeats the
+          match, and an owner's own buildings scatter across unrelated groups.</p>
+        <p class="who">→ fixed here, by probabilistic record linkage</p>
+      </div>
+      <div class="mode merge">
+        <span class="tag">False merges</span>
+        <h3>Many owners, one portfolio</h3>
+        <p>A registered-agent office, management company, or law firm's address is shared by
+          many unrelated owners, and the address link lumps them together.</p>
+        <p class="who">→ fixed by the follow-up, beneficial-ownership-resolution</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>See the false-split problem</h2>
+    <p>Steven Croman surfaces as ~12 contact identities across 6 offices — one a
+      <code>424 WEST 51</code> vs <code>4 WEST 51</code> typo away from another. Who Owns What
+      splits him into 6 separate portfolios; this engine resolves him to a single entity of
+      127 buildings, while never fusing two different people.</p>
+    <a class="mapcard" href="maps/croman.html">
+      <div class="body">
+        <p class="kicker">Interactive map</p>
+        <h3>Steven Croman · 127 buildings</h3>
+        <p>Toggle between the 6 portfolios Who Owns What splits him into and the single owner
+          the resolver recovers.</p>
+        <span class="go">Open the map →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How it measures up</h2>
+    <p>Validated against a 105-record hand-adjudicated gold set (pairwise precision ≈ 0.996,
+      zero namesake fusions), and against Who Owns What directly on a blind, preregistered
+      sample of the candidate frame:</p>
+    <figure>
+      <img src="measured-vs-wow.svg"
+           alt="On the 67 sampled splink merges where splink and JustFix disagree, splink is right 64 times and JustFix 3 — McNemar p < 0.001.">
+      <figcaption>Head-to-head on the model frame — splink merges vs Who Owns What, scored
+        against blind human adjudication.</figcaption>
+    </figure>
+    <div class="stats">
+      <div class="stat"><div class="n">96.7%</div><div class="l">splink merge precision (Wilson 92–99%)</div></div>
+      <div class="stat"><div class="n">≈5,000</div><div class="l">Who Owns What false-splits recovered</div></div>
+      <div class="stat"><div class="n">0.996</div><div class="l">pairwise precision on the 105-record gold set</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The other blind spot</h2>
+    <p>False merges — distinct landlords fused because they share an office — are the subject of
+      a follow-up project,
+      <a href="https://github.com/bobflagg/beneficial-ownership-resolution">beneficial-ownership-resolution</a>
+      (&ldquo;Watchline&rdquo;). Where this engine asks <em>&ldquo;are these the same name?&rdquo;</em>,
+      that one asks <em>&ldquo;are these the same beneficial owner?&rdquo;</em> — pulling in ACRIS
+      deeds, NYS DOS filings, and adjudicated review. On the same blind 512-pair frame it beat
+      Who Owns What on 236 of the 259 pairs where the two disagree (McNemar p&nbsp;&lt;&nbsp;0.001).
+      Together, the two projects cover both of Who Owns What's blind spots.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="note"><strong>These groupings are algorithmic inferences from public records —
+      leads to verify, not determinations of legal ownership.</strong></div>
+    <p>Resolution: <code>nyc-landlord-resolution</code> (Splink / Fellegi-Sunter) over HPD
+      registrations. Building coordinates: NYC DOF/PLUTO. Who Owns What assignment: JustFix
+      <code>wow.wow_portfolios</code>. Base map tiles © Esri. &nbsp;·&nbsp;
+      <a href="https://github.com/bobflagg/nyc-landlord-resolution">Source &amp; docs on GitHub</a> ·
+      MIT licensed.</p>
+  </div>
+</footer>
+</body>
+</html>
