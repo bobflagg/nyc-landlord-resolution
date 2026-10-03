@@ -33,7 +33,7 @@ entrench the splits.
 
 ## Fixing false splits
 
-`nyc-landlord-resolution` targets the false-split failure mode. Instead of matching on exact
+This repo targets the false-split failure mode. Instead of matching on exact
 or near-exact fields, it resolves each owner *probabilistically* — Splink's Fellegi-Sunter
 model scores every candidate pair on name and address agreement, learning from the data how
 much a rare-surname match or a one-character address difference is worth. **Domenico
@@ -190,7 +190,7 @@ uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headli
 
 The other failure mode — false merges, where WoW fuses distinct landlords who merely share an
 office — is the subject of a follow-up project,
-**[beneficial-ownership-resolution](https://github.com/bobflagg/beneficial-ownership-resolution)**
+**[NYC Beneficial Owner Resolution](https://github.com/bobflagg/nyc-beneficial-owner-resolution)**
 ("Watchline"). Where this engine asks *"are these the same name?"*, that one asks *"are these
 the same beneficial owner?"* — pulling in ACRIS deeds, NYS DOS filings, and LLM-adjudicated
 review to tell apart owners who only coincide at a registered-agent address, a managing agent,
