@@ -73,7 +73,7 @@ for owner, nodes in group_nodes_by_owner(graph, owners).items():
 ```
 
 Because edges only *add*, connected components only *merge*, never split: WoW's existing
-address-nexus portfolios (a shell operation sharing one managing office) are preserved, while
+address-network portfolios (a shell operation sharing one managing office) are preserved, while
 an owner's scattered offices collapse into one. In a live run this consolidated **~7,476
 fragmented portfolios** with zero namesake fusions. (This is the record-linkage engine built
 for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**, extracted to stand on its own.)
