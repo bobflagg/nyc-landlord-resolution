@@ -16,20 +16,23 @@ into a tool for accountability.
 JustFix's **[Who Owns What](https://github.com/JustFixNYC/who-owns-what)** (WoW) is the gold
 standard for this task. It models the city's landlords as a graph of registration contacts
 linked by shared names and business addresses, then clusters that graph (WCC + Louvain) into
-portfolios — the backbone of countless tenant tools and news investigations. Because its
-links are name/address matches, it is strong and conservative, but it has two characteristic
-failure modes:
+portfolios — the backbone of countless tenant tools and news investigations. Read for what it
+is, a WoW portfolio is an **operational network**: the buildings run through the same people,
+offices, and managing hands. Two things can go wrong around it, and they differ in kind:
 
-- **False splits** — one landlord fractured into several portfolios. A business-address typo,
-  a second office, or a per-building shell LLC defeats the match, and an owner's own buildings
-  scatter across unrelated groups.
-- **False merges** — distinct landlords fused into one. A registered-agent office, a
-  management company, or a law firm's address is shared by many unrelated owners, and the
-  address link lumps them together.
+- **Noise in the signal (false splits)** — one landlord fractured into several portfolios. A
+  business-address typo, a second office, or a per-building shell LLC defeats the match, and an
+  owner's own buildings scatter across unrelated groups. The question is still *who operates
+  this?* — the measurement is just noisy. **This repo fixes that.**
+- **A signal asked a second question** — a shared business address is strong evidence that two
+  buildings are *operated* together and weak evidence that they are *owned* by the same party: a
+  registered-agent office, management company, or law firm serves many unrelated owners. The
+  portfolio isn't wrong, but read as an ownership claim it attributes buildings to a party who
+  doesn't own them.
 
-The two errors pull in opposite directions, and fixing one naively worsens the other: loosen
-the matching to recover splits and you create merges; tighten it to avoid merges and you
-entrench the splits.
+**Don't ask one signal two questions.** The first problem is cleaned up by better record linkage.
+The second isn't a matching problem at all — it needs a different question, answered by different
+evidence (see [the follow-up](#ownership-gets-its-own-question) below).
 
 ## Fixing false splits
 
@@ -186,20 +189,21 @@ uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headli
 > figures above cover the model (splink) stratum — this engine's contribution. Deed-based linkage
 > and the end-to-end head-to-head vs WoW belong to the broader Watchline system, not this library.
 
-## Fixing false merges
+## Ownership gets its own question
 
-The other failure mode — false merges, where WoW fuses distinct landlords who merely share an
-office — is the subject of a follow-up project,
+The second problem — a shared office read as shared ownership — is the subject of a follow-up
+project,
 **[NYC Beneficial Owner Resolution](https://github.com/bobflagg/nyc-beneficial-owner-resolution)**
 ("Watchline"). Where this engine asks *"are these the same name?"*, that one asks *"are these
-the same beneficial owner?"* — pulling in ACRIS deeds, NYS DOS filings, and LLM-adjudicated
-review to tell apart owners who only coincide at a registered-agent address, a managing agent,
-or a law office.
+the same beneficial owner?"* — resolving ownership from ownership evidence only (ACRIS deeds, NYS
+DOS filings, and LLM-adjudicated review) rather than from a shared registered-agent address,
+managing agent, or law office, and keeping WoW's operational network as its own separate layer.
 
-On the same blind, preregistered 512-pair frame, its resolver beat WoW on **236 of the 259
-pairs where the two disagree** (McNemar p < 0.001; annotator κ = 0.89), and correctly **split
-~98%** of the pairs WoW groups only through a shared aggregator address. Between the two
-projects, both of WoW's blind spots are covered — false splits here, false merges there.
+On the same blind, preregistered 512-pair frame, labeled for beneficial ownership, its ownership
+layer beat a WoW portfolio read as an ownership claim on **236 of the 259 pairs where the two
+disagree** (McNemar p < 0.001; annotator κ = 0.89), and correctly kept **~98%** of the pairs WoW
+groups only through a shared aggregator address separate. Between the two projects, the
+operational signal gets cleaned up here and ownership gets its own answer there.
 
 ## Status / roadmap
 

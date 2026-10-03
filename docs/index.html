@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NYC Landlord Resolution</title>
-<meta name="description" content="Precision-first probabilistic resolution of NYC landlord/owner identities from public HPD records — fixing the false-split blind spot in Who Owns What.">
+<meta name="description" content="Precision-first probabilistic resolution of NYC landlord/owner identities from public HPD records — reuniting an owner's fragmented portfolios in Who Owns What.">
 <style>
   :root{
     --ink:#1a2129; --soft:#5b6570; --line:#e2e6e0; --panel:#fff; --bg:#f4f6f3;
@@ -105,8 +105,9 @@
       and a pattern becomes visible across the whole portfolio; get it wrong and accountability
       slips through the cracks.</p>
     <p>JustFix's <a href="https://github.com/JustFixNYC/who-owns-what">Who Owns What</a> is the
-      gold standard for this task — but because it links landlords by shared names and
-      addresses, it has two characteristic blind spots:</p>
+      gold standard for this task. It links landlords by shared names and addresses, so its
+      portfolios are best read as <em>operational networks</em> — and two things can go wrong
+      around them:</p>
     <div class="modes">
       <div class="mode split">
         <span class="tag">False splits</span>
@@ -116,11 +117,12 @@
         <p class="who">→ fixed here, by probabilistic record linkage</p>
       </div>
       <div class="mode merge">
-        <span class="tag">False merges</span>
-        <h3>Many owners, one portfolio</h3>
+        <span class="tag">A second question</span>
+        <h3>Operated together &ne; owned together</h3>
         <p>A registered-agent office, management company, or law firm's address is shared by
-          many unrelated owners, and the address link lumps them together.</p>
-        <p class="who">→ fixed by the follow-up, NYC Beneficial Owner Resolution</p>
+          many unrelated owners — good evidence they operate together, weak evidence they own
+          together.</p>
+        <p class="who">→ answered by the follow-up, NYC Beneficial Owner Resolution</p>
       </div>
     </div>
   </div>
@@ -169,15 +171,16 @@
 
 <section>
   <div class="wrap">
-    <h2>The other blind spot</h2>
-    <p>False merges — distinct landlords fused because they share an office — are the subject of
-      a follow-up project,
+    <h2>Ownership gets its own question</h2>
+    <p>Reading a shared office as shared ownership is the subject of a follow-up project,
       <a href="https://github.com/bobflagg/nyc-beneficial-owner-resolution">NYC Beneficial Owner Resolution</a>
       (&ldquo;Watchline&rdquo;). Where this engine asks <em>&ldquo;are these the same name?&rdquo;</em>,
       that one asks <em>&ldquo;are these the same beneficial owner?&rdquo;</em> — pulling in ACRIS
-      deeds, NYS DOS filings, and adjudicated review. On the same blind 512-pair frame it beat
-      Who Owns What on 236 of the 259 pairs where the two disagree (McNemar p&nbsp;&lt;&nbsp;0.001).
-      Together, the two projects cover both of Who Owns What's blind spots.</p>
+      deeds, NYS DOS filings, and adjudicated review — while keeping the operational network as its
+      own layer. On the same blind 512-pair frame, labeled for ownership, it beat a Who Owns What
+      portfolio read as an ownership claim on 236 of the 259 pairs where the two disagree
+      (McNemar p&nbsp;&lt;&nbsp;0.001). Together, the two projects clean up the operational signal
+      and give ownership its own answer.</p>
   </div>
 </section>
 
