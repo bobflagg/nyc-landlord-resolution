@@ -17,18 +17,21 @@ JustFix's **[Who Owns What](https://github.com/JustFixNYC/who-owns-what)** (WoW)
 standard for this task. It models the city's landlords as a graph of registration contacts
 linked by shared names and business addresses, then clusters that graph (WCC + Louvain) into
 portfolios — the backbone of countless tenant tools and news investigations. Read for what it
-is, a WoW portfolio is an **operational network**: the buildings run through the same people,
-offices, and managing hands. Two things can go wrong around it, and they differ in kind:
+is, a WoW portfolio is a *registration network*: buildings tied through the people and offices
+they register with. Where that tie is an owner's or a manager's office, it is an **operational
+network** — the buildings run through the same hands. Two things can go wrong around it, and they
+differ in kind:
 
 - **Noise in the signal (false splits)** — one landlord fractured into several portfolios. A
   business-address typo, a second office, or a per-building shell LLC defeats the match, and an
   owner's own buildings scatter across unrelated groups. The question is still *who operates
   this?* — the measurement is just noisy. **This repo fixes that.**
-- **A signal asked a second question** — a shared business address is strong evidence that two
-  buildings are *operated* together and weak evidence that they are *owned* by the same party: a
-  registered-agent office, management company, or law firm serves many unrelated owners. The
-  portfolio isn't wrong, but read as an ownership claim it attributes buildings to a party who
-  doesn't own them.
+- **A signal asked a second question** — a shared business address says two buildings register
+  from the same place, and what that implies depends on the place. An owner's own office points to
+  one owner-operator; a management office, to shared operation but not ownership; and a shared
+  mailbox or service provider — an office suite many small landlords file from, a registered
+  agent, a law firm — to little about either. The portfolio accurately records who registers
+  where; read as an ownership claim, it attributes buildings to a party who doesn't own them.
 
 **Don't ask one signal two questions.** The first problem is cleaned up by better record linkage.
 The second isn't a matching problem at all — it needs a different question, answered by different
@@ -191,13 +194,13 @@ uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headli
 
 ## Ownership gets its own question
 
-The second problem — a shared office read as shared ownership — is the subject of a follow-up
+The second problem — a shared address read as shared ownership — is the subject of a follow-up
 project,
 **[NYC Beneficial Owner Resolution](https://github.com/bobflagg/nyc-beneficial-owner-resolution)**
 ("Watchline"). Where this engine asks *"are these the same name?"*, that one asks *"are these
 the same beneficial owner?"* — resolving ownership from ownership evidence only (ACRIS deeds, NYS
-DOS filings, and LLM-adjudicated review) rather than from a shared registered-agent address,
-managing agent, or law office, and keeping WoW's operational network as its own separate layer.
+DOS filings, and LLM-adjudicated review) rather than from a shared address, and keeping an
+operational-network layer, with aggregator hubs masked, as its own separate layer.
 
 On the same blind, preregistered 512-pair frame, labeled for beneficial ownership, its ownership
 layer beat a WoW portfolio read as an ownership claim on **236 of the 259 pairs where the two
