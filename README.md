@@ -198,14 +198,18 @@ The second problem — a shared address read as shared ownership — is the subj
 project,
 **[NYC Beneficial Owner Resolution](https://github.com/bobflagg/nyc-beneficial-owner-resolution)**
 ("Watchline"). Where this engine asks *"are these the same name?"*, that one asks *"are these
-the same beneficial owner?"* — resolving ownership from ownership evidence only (ACRIS deeds, NYS
-DOS filings, and LLM-adjudicated review) rather than from a shared address, and keeping an
+the same beneficial owner?"* — resolving ownership from ownership evidence only (ACRIS deeds and
+resolved registration identities) rather than from a shared address, and keeping an
 operational-network layer, with aggregator hubs masked, as its own separate layer.
 
-On the same blind, preregistered 512-pair frame, labeled for beneficial ownership, its ownership
-layer beat a WoW portfolio read as an ownership claim on **236 of the 259 pairs where the two
-disagree** (McNemar p < 0.001; annotator κ = 0.89), and correctly kept **~98%** of the pairs WoW
-groups only through a shared aggregator address separate. Between the two projects, the
+It is evaluated on precision only, on a stratified sample of candidate pairs frozen before labeling
+and judged against primary records without being told which system or stratum produced each pair,
+by one human annotator and an LLM second reader, with disagreements resolved by an LLM-conducted
+review. Roughly 97% of links from a held multi-parcel deed and roughly 97% of resolved-identity
+links were judged the same owner. Links through a deed later split into separate LLCs are the weak
+spot, at roughly 70%, and roughly 98% of pairs sharing a masked aggregator address were correctly
+kept apart. Recall is not estimated, and there is no head-to-head tally against WoW, because a WoW
+portfolio is a co-registration network, not an ownership classifier. Between the two projects, the
 operational signal gets cleaned up here and ownership gets its own answer there.
 
 ## Status / roadmap
