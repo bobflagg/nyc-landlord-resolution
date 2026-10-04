@@ -177,11 +177,15 @@
       <a href="https://github.com/bobflagg/nyc-beneficial-owner-resolution">NYC Beneficial Owner Resolution</a>
       (&ldquo;Watchline&rdquo;). Where this engine asks <em>&ldquo;are these the same name?&rdquo;</em>,
       that one asks <em>&ldquo;are these the same beneficial owner?&rdquo;</em> — pulling in ACRIS
-      deeds, NYS DOS filings, and adjudicated review — while keeping an operational-network layer,
-      with aggregator hubs masked, as its own. On the same blind 512-pair frame, labeled for ownership, it beat a Who Owns What
-      portfolio read as an ownership claim on 236 of the 259 pairs where the two disagree
-      (McNemar p&nbsp;&lt;&nbsp;0.001). Together, the two projects clean up the operational signal
-      and give ownership its own answer.</p>
+      deeds and resolved registration identities — while keeping an operational-network layer,
+      with aggregator hubs masked, as its own. It is evaluated on precision only, on a stratified
+      sample judged against primary records by one human annotator and an LLM second reader. Roughly
+      97% of its deed-held and resolved-identity links were judged the same owner; links through a
+      deed later split into separate LLCs are the weak spot, at roughly 70%; and roughly 98% of pairs
+      sharing a masked aggregator address were correctly kept apart. Recall is not estimated, and
+      there is no head-to-head tally against Who Owns What, which maps co-registration, not
+      ownership. Together, the two projects clean up the operational signal and give ownership its
+      own answer.</p>
   </div>
 </section>
 
