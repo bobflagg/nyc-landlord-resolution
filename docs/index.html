@@ -153,19 +153,20 @@
 <section>
   <div class="wrap">
     <h2>How it measures up</h2>
-    <p>Validated against a 105-record hand-adjudicated gold set (pairwise precision ≈ 0.996,
-      zero namesake fusions), and against Who Owns What directly on a blind, preregistered
-      sample of the candidate frame:</p>
+    <p>Developed and tuned on a 105-record hand-adjudicated gold set (pairwise precision ≈ 0.996 on
+      that set, an optimistic figure because the clustering threshold was calibrated against it),
+      then tested out of sample against Who Owns What on a blind, preregistered sample of the
+      candidate frame:</p>
     <figure>
       <img src="measured-vs-wow.svg"
            alt="On the 67 sampled splink merges where splink and JustFix disagree, splink is right 64 times and JustFix 3 — McNemar p < 0.001.">
       <figcaption>Head-to-head on the model frame — splink merges vs Who Owns What, scored
-        against blind human adjudication.</figcaption>
+        against one human annotator's blind labels.</figcaption>
     </figure>
     <div class="stats">
       <div class="stat"><div class="n">96.7%</div><div class="l">splink merge precision (Wilson 92–99%)</div></div>
       <div class="stat"><div class="n">≈5,000</div><div class="l">Who Owns What false-splits recovered</div></div>
-      <div class="stat"><div class="n">0.996</div><div class="l">pairwise precision on the 105-record gold set</div></div>
+      <div class="stat"><div class="n">64 of 67</div><div class="l">sampled links beyond Who Owns What's own were correct (95.5%, Wilson 88–99%)</div></div>
     </div>
   </div>
 </section>
