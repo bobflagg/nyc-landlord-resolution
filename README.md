@@ -75,18 +75,21 @@ for owner, nodes in group_nodes_by_owner(graph, owners).items():
 Because edges only *add*, connected components only *merge*, never split: WoW's existing
 address-network portfolios (a shell operation sharing one managing office) are preserved, while
 an owner's scattered offices collapse into one. In a live run this consolidated **~7,476
-fragmented portfolios** with zero namesake fusions. (This is the record-linkage engine built
+fragmented portfolios**; how often the added links are right is measured
+[below](#measured-against-who-owns-what). (This is the record-linkage engine built
 for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**, extracted to stand on its own.)
 
 ## How it measures up
 
-Validated against a **105-record hand-adjudicated gold set** (`nlr/eval/gold_set.csv`) —
+Developed and tuned against a **105-record hand-adjudicated gold set** (`nlr/eval/gold_set.csv`) —
 owner-contact records each labeled by hand to a true owner, scored pairwise and precision-first
 because a false merge (naming the wrong landlord) is the costly error: pairwise
-**precision ≈ 0.996**, **zero namesake fusions**, and the fragmented operators consolidate. The
-benchmark reproduces identically on either backend — Postgres or the offline DuckDB snapshot.
+**precision ≈ 0.996** on that set, and the fragmented operators consolidate. The clustering
+threshold was calibrated against this set, so 0.996 is an optimistic development-set figure, not an
+out-of-sample result. The benchmark reproduces identically on either backend — Postgres or the
+offline DuckDB snapshot.
 
-That 105-record set measures *internal* precision; a second, blinded evaluation measures the
+Because that set was used for tuning, a second, blinded evaluation measures the
 fix **against WoW directly** — how often a splink merge is right and how many real false-splits
 it recovers. See [Measured against Who Owns What](#measured-against-who-owns-what) below.
 
@@ -144,7 +147,7 @@ owners = owner_index(duckdb_conn("data/hpd_contacts.parquet",
                                  "data/hpd_registrations.parquet"))
 ```
 
-The Postgres SQL is dialect-dispatched onto DuckDB, so results match — the gold benchmark
+The Postgres SQL is dialect-dispatched onto DuckDB, so results match — the development-set benchmark
 reproduces **P ≈ 0.996** on either backend. `owner_index`'s training slice is a *stratified*
 sample (every identity with a same-name peer), computed in pandas over the extracted records —
 identically on both backends — so there is no cross-backend divergence (the earlier
