@@ -1,6 +1,7 @@
-"""Score CONNECTED_BY_SPLINK's false-split impact against the frozen frame gold and print the
-per-stratum table + the two headline numbers. Pure read of ``frame_gold.jsonl`` — no DB, no
-splink re-run — so it reproduces the README's "Measured against Who Owns What" figures anywhere."""
+"""Score the precision of CONNECTED_BY_SPLINK's links against the frozen frame gold and print the
+per-stratum table + the model-stratum headline. Pure read of ``frame_gold.jsonl`` — no DB, no
+splink re-run — so it reproduces the README's "Measured against Who Owns What" figures anywhere.
+Precision only; recall is not estimated."""
 import json
 from pathlib import Path
 
@@ -31,24 +32,23 @@ def main():
 
     s2 = reports.get("S2_model")
     s4 = reports.get(fi.RESIDUAL_STRATUM)
-    print("\n— HEADLINE —")
+    print("\n— HEADLINE (precision only; recall is not estimated) —")
     if s2:
-        print(f"CONNECTED_BY_SPLINK precision (S2_model, n={s2['same']+s2['diff']}): "
-              f"{_pct(s2['precision_strict'])}  — {s2['same']}/{s2['same']+s2['diff']} merges correct, "
-              f"{s2['diff']} false merges.")
-        print(f"  net-new false-split fixes (gold SAME & WoW split): {s2['net_new_fix']}/{s2['n']}  "
-              f"(WoW already merged {s2['wow_already_same']}).")
+        print(f"CONNECTED_BY_SPLINK link precision (S2_model, n={s2['same']+s2['diff']}): "
+              f"{_pct(s2['precision_strict'])}  — {s2['same']}/{s2['same']+s2['diff']} links correct, "
+              f"{s2['diff']} wrong.")
+        print(f"  links that join separate WoW portfolios (net-new): {s2['net_new_fix']}/{s2['net_new_decided']} correct  "
+              f"{_pct(s2['net_new_precision'])}  (WoW already groups {s2['wow_already_same']} of the correct links).")
         print(f"  extrapolated to the {s2['frame_size']}-pair model frame: "
-              f"~{s2['est_correct_merges']:,} correct merges; "
-              f"~{s2['est_net_new_fixes']:,} net-new WoW false-splits recovered.")
+              f"~{s2['est_correct_merges']:,} correct links; "
+              f"~{s2['est_net_new_fixes']:,} of them join separate WoW portfolios.")
     if s4:
         resid = fi.wilson(s4["same"], s4["same"] + s4["diff"])
-        print(f"Residual missed splits (S4_hard_neg, n={s4['same']+s4['diff']}): "
-              f"{resid[0]*100:.1f}% of unlinked same-surname pairs are truly the same owner "
-              f"-> ~{round(s4['frame_size']*resid[0]):,} of {s4['frame_size']} unrecovered.")
+        print(f"Exploratory, not a headline (S4_hard_neg, n={s4['same']+s4['diff']}): "
+              f"{resid[0]*100:.1f}% of unlinked same-surname pairs were judged the same owner.")
 
     if s2 and s2["false_merges"]:
-        print(f"\nfalse merges in S2 (gold DIFFERENT among splink's merges) — {len(s2['false_merges'])}:")
+        print(f"\nwrong links in S2 (gold DIFFERENT among splink's links) — {len(s2['false_merges'])}:")
         for r in s2["false_merges"]:
             print(f"  {r['pair_id']}  {r.get('a_name','?'):<22} <> {r.get('b_name','?')}")
 
