@@ -116,6 +116,10 @@ companion to the code — the *why* behind each precision decision.
 one landlord's records through scoring, the base groups and the shared-company pass, with
 waterfall charts of the pairs that decide the outcome.
 
+For a one-page overview, the interactive
+**[Landlord Resolution Pipeline](https://claude.ai/artifact/GM4Z4gJhMZVwTzwm1cFhP3)** maps the
+stages, shows the join decision for a single pair, and has the same worked score waterfalls.
+
 ## Use it
 
 ```python
