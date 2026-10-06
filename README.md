@@ -44,25 +44,33 @@ or near-exact fields, it resolves each owner *probabilistically* — Splink's Fe
 model scores every candidate pair on name and address agreement, learning from the data how
 much a rare-surname match or a one-character address difference is worth. **Domenico
 Antonelli**, a Queens landlord whose 10 buildings are registered from a handful of offices, is
-shattered by WoW into **9 separate portfolios** — a single office, `150-115 POWELLS COVE
-BOULEVARD`, is also typed `150-115 POWELLS COW B`, a hyphen is dropped from `146-48`, and each
-variant spawns its own portfolio. This engine reunites all 10 into **one entity**, while two
-unrelated JIN CHENs at different addresses never merge.
+split by WoW into **9 separate portfolios**. A single office, `150-115 POWELLS COVE BOULEVARD`,
+is also typed `150-115 POWELLS COW B`, a hyphen is dropped from `146-48`, and the rest are
+different offices, so each spawns its own portfolio. Scoring name and address together reunites
+the variants (9 portfolios become 5 groups). A **second pass** then joins those groups when
+their buildings share a company named on the registrations (here his managing agent) and the
+name is rare, giving **one entity**. That second pass rests on management evidence rather than
+a name or an address, and it is the least reliable stage in the labeled sample. Two unrelated
+JIN CHENs at different addresses are not merged on name alone. The trace, step by step, with the
+sampled breakdown of that pass, is in **[What-joins-Antonelli.ipynb](What-joins-Antonelli.ipynb)**.
 
 > **[→ See it on the map](https://bobflagg.github.io/nyc-landlord-resolution/maps/antonelli.html)** —
 > Antonelli's 10 buildings as one resolved owner, toggled against the 9 separate portfolios Who
 > Owns What splits him into.
 
-The engine is tuned to **never merge two different owners**, even at the cost of a little
-recall:
+The engine is tuned to **avoid merging two different owners**, even at the cost of some recall:
 
 - **Name-anchored blocking** — a surname match is required to even score a pair.
 - **First-name veto** — JACOB and JOSEF at one office are different people, not merged.
-- **Common-name veto** — two unrelated JIN CHENs at different addresses never merge.
+- **Common-name veto** — a common name at different addresses is not merged on name alone
+  (two unrelated JIN CHENs).
 - **Aggregator-address masking** — a registered-agent office shared by many landlords is
   down-weighted, so office-mates aren't fused.
+- **Shared-company pass, with guards** — only rare names, compatible first names, and a cap on
+  how many contacts are listed under the shared company. A company can be an owner or a managing
+  agent, and the pass does not distinguish them.
 
-It drops into WoW **without changing its clustering at all** — it adds one high-confidence
+It drops into WoW **without changing its clustering algorithm** — it adds one high-confidence
 edge type:
 
 ```python
@@ -72,10 +80,11 @@ for owner, nodes in group_nodes_by_owner(graph, owners).items():
     add_clique(graph, nodes, type="splink", weight=10.0)   # WCC/Louvain do the rest
 ```
 
-Because edges only *add*, connected components only *merge*, never split: WoW's existing
-address-network portfolios (a shell operation sharing one managing office) are preserved, while
-an owner's scattered offices collapse into one. In a live run this consolidated **~7,476
-fragmented portfolios**; how often the added links are right is measured
+Because edges only *add*, connected components can only *merge*; WoW's existing address-network
+portfolios (a shell operation sharing one managing office) stay together, and WoW's own WCC and
+Louvain steps run unchanged on the larger graph. An owner's scattered offices collapse into
+one. In a live run this consolidated **~7,476 fragmented portfolios**; how often the added links
+are right is measured
 [below](#measured-against-who-owns-what). (This is the record-linkage engine built
 for **[WatchlineNYC](https://github.com/bobflagg/WatchlineNYC)**, extracted to stand on its own.)
 
@@ -99,10 +108,13 @@ A step-by-step walkthrough of the resolution algorithm — following the arc of 
 Splink tutorial — lives in **[How-it-works.ipynb](How-it-works.ipynb)**. It traces one landlord
 from raw HPD contacts through every stage: data prep and the name-anchored blocking rule, the
 exploratory look at name rarity and aggregator addresses, the Fellegi-Sunter model fit and its
-match-weight waterfall, the two precision vetoes and the corporate-co-owner feedback pass that
-reunites an owner's scattered offices, and finally the full-population `owner_index` scored
-against the gold set. It is the readable companion to the code — the *why* behind each
-precision decision.
+match-weight waterfall, the two precision vetoes and the shared-company feedback pass (a company
+named on the registrations, owner or managing agent) that reunites an owner's scattered offices,
+and finally the full-population `owner_index` scored against the gold set. It is the readable
+companion to the code — the *why* behind each precision decision.
+**[What-joins-Antonelli.ipynb](What-joins-Antonelli.ipynb)** is a second walkthrough that follows
+one landlord's records through scoring, the base groups and the shared-company pass, with
+waterfall charts of the pairs that decide the outcome.
 
 ## Use it
 
@@ -176,7 +188,7 @@ scored against each pair's WoW decision.
   ~97% precision, across ~11,400 correct merges.
 - **Residual:** on a parallel sample of *unlinked* same-surname pairs, ~11% are in fact the
   same owner — splink's precision-first vetoes still miss roughly **780** recoverable splits.
-  That is the cost of never fusing two different people.
+  That is the cost of the precision-first vetoes.
 
 The headline is robust to who labels it: precision and the false-split count are **unchanged**
 when gold is restricted to a single human annotator (a second LLM reader agrees at κ = 0.89
