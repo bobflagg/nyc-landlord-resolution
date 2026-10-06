@@ -98,9 +98,9 @@ threshold was calibrated against this set, so 0.996 is an optimistic development
 out-of-sample result. The benchmark reproduces identically on either backend — Postgres or the
 offline DuckDB snapshot.
 
-Because that set was used for tuning, a second, blinded evaluation measures the
-fix **against WoW directly** — how often a splink merge is right and how many real false-splits
-it recovers. See [Measured against Who Owns What](#measured-against-who-owns-what) below.
+Because that set was used for tuning, a second evaluation measures the links this engine would
+**add on top of WoW** — how often they are right, and how many join portfolios WoW keeps
+separate. See [Measured against Who Owns What](#measured-against-who-owns-what) below.
 
 ## How it works
 
@@ -168,44 +168,55 @@ hash-sample caveat is gone).
 ## Measured against Who Owns What
 
 The 105-record gold set above measures *internal* pairwise precision. A second, independent
-evaluation measures the thing that matters for the integration: **when this engine adds a
-"same owner" edge, how often is it right, and how many real false-splits does it fix that WoW
-leaves fragmented?**
+evaluation asks the question that matters for the integration: **when this engine adds a "same
+owner" edge on top of WoW, how often is it right?** The patch only adds edges, so the precision of
+the added links is the quantity to measure. It is a measure of this engine's links, not a score of
+WoW's portfolios: a WoW portfolio records who registers where, and is not an ownership classifier.
 
-![Head-to-head on the model frame: on the 67 sampled splink merges where splink and JustFix
-disagree, splink is right 64 times and JustFix 3 — McNemar p < 0.001.](docs/measured-vs-wow.svg)
+![Precision of the links the model adds: 97% of 150 sampled links were the same owner; 64 of the 67
+that join separate Who Owns What portfolios were correct; by stage, 49 of 49 through name and
+address and 15 of 18 through the shared-company pass.](docs/precision-of-added-links.svg)
 
-The test is a **preregistered, blinded, hand-adjudicated** stratified sample of the
-model-linkage frame — the 11,742 candidate pairs splink scores but WoW's name/address
-clustering does not already merge. 150 pairs were drawn, labeled blind by a human adjudicator
-(SAME / DIFFERENT / INDETERMINATE) against the primary record, and only then unblinded and
-scored against each pair's WoW decision.
+The test is a stratified sample of the model-linkage frame — the 11,742 candidate pairs the model
+links but WoW's name/address clustering does not already merge — drawn from a frame frozen before
+labeling. 150 pairs were judged against primary records (HPD registrations, ACRIS) without being
+told the model's score or WoW's grouping, by one human annotator and an LLM second reader;
+disagreements were settled by an LLM-conducted review.
 
-- **Precision: 96.7%** (145 / 150 correct merges; Wilson 95% CI 92–99%). Five false merges.
-- **64 of the 150** recover a split that WoW leaves fragmented (the two sides sit in separate
-  WoW portfolios) — net-new false-split fixes, not merges WoW already had.
-- Extrapolating the sample rate to the full frame: **≈5,000 WoW false-splits recovered** at
-  ~97% precision, across ~11,400 correct merges.
-- **Residual:** on a parallel sample of *unlinked* same-surname pairs, ~11% are in fact the
-  same owner — splink's precision-first vetoes still miss roughly **780** recoverable splits.
-  That is the cost of the precision-first vetoes.
+- **Precision: 96.7%** (145 / 150 sampled links judged the same owner; Wilson 95% CI 92–99%).
+  Five were different people.
+- **67 of the 150** join pairs that WoW keeps in separate portfolios — the links a patch would
+  add — and **64 of those 67 were right** (95.5%; Wilson 88–99%).
+- Extrapolating the sample rate to the full frame: about 11,400 correct links, of which about
+  5,000 join portfolios WoW keeps separate.
+- **By stage (exploratory).** The 49 sampled cross-portfolio links that rest on name and address
+  alone were all right; the 18 that rest on the shared-company second pass were right 15 times.
+  All three wrong cross-portfolio links were different people with the same full name, joined
+  through a shared management company, with a 50+ building WoW portfolio on one side. The split
+  was made after the errors were known and the numbers are small, so read it as a lead, not a
+  measurement. [What-joins-Antonelli.ipynb](What-joins-Antonelli.ipynb) reproduces it.
+- **Recall is not estimated**, and the absence of a link does not mean two records are different
+  owners.
 
-The headline is robust to who labels it: precision and the false-split count are **unchanged**
-when gold is restricted to a single human annotator (a second LLM reader agrees at κ = 0.89
-and is excluded from gold), so the result does not rest on any model's judgment.
+The gold in the committed fixture is one human annotator's labels. Adding the LLM second reader
+and an LLM-conducted resolution of the disagreements leaves these figures unchanged. A blind second
+human reading is planned, and the figures are provisional until then.
 
 Reproduce it from the committed gold fixture — no database, no splink re-run:
 
 ```bash
-uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the headline above
+uv run python -m nlr.eval.run_frame_impact      # per-stratum table + the model-stratum figures above
 ```
 
-> The gold is a frozen fixture (`nlr/eval/frame_gold.jsonl`): a blind, preregistered sample
-> adjudicated in the owner-review app and exported by `bor.eval.export_gold` against the
-> September 2026 HPD/ACRIS dump — provenance in `frame_gold.manifest.json`, full protocol and
-> population math in [docs/false-split-impact-metric.md](docs/false-split-impact-metric.md). The
-> figures above cover the model (splink) stratum — this engine's contribution. Deed-based linkage
-> and the end-to-end head-to-head vs WoW belong to the broader Watchline system, not this library.
+(The script also prints the other strata and an exploratory residual; this README headlines only
+the model stratum.)
+
+> The gold is a frozen fixture (`nlr/eval/frame_gold.jsonl`): a blind sample adjudicated in the
+> owner-review app and exported by `bor.eval.export_gold` against the September 2026 HPD/ACRIS
+> dump — provenance in `frame_gold.manifest.json`, full protocol and population math in
+> [docs/false-split-impact-metric.md](docs/false-split-impact-metric.md). The figures above cover
+> the model (splink) stratum — this engine's contribution. Deed-based linkage is evaluated in
+> [NYC Beneficial Owner Resolution](https://github.com/bobflagg/nyc-beneficial-owner-resolution).
 
 ## Ownership gets its own question
 

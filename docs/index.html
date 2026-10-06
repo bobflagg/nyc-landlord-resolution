@@ -133,11 +133,14 @@
   <div class="wrap">
     <h2>See the false-split problem</h2>
     <p>Domenico Antonelli, a Queens landlord, has just 10 buildings registered from a handful
-      of offices — but one office, <code>150-115 POWELLS COVE BOULEVARD</code>, is also typed
-      <code>150-115 POWELLS COW B</code>, a hyphen is dropped from <code>146-48</code>, and each
-      variant spawns its own portfolio. Who Owns What splits him into 9 separate portfolios;
-      this engine reunites all 10 buildings into one entity, while never fusing two different
-      people.</p>
+      of offices &mdash; but one office, <code>150-115 POWELLS COVE BOULEVARD</code>, is also typed
+      <code>150-115 POWELLS COW B</code>, a hyphen is dropped from <code>146-48</code>, and the
+      rest are different offices, so each spawns its own portfolio. Who Owns What splits him into
+      9 separate portfolios. Scoring name and address together reunites the variants (9 portfolios
+      become 5 groups); a second pass then joins those groups when their buildings share a company
+      named on the registrations (here his managing agent) and the name is rare, giving one entity.
+      That second pass rests on management evidence rather than a name or an address, and it is
+      the least reliable stage in the labeled sample.</p>
     <a class="mapcard" href="maps/antonelli.html">
       <div class="body">
         <p class="kicker">Interactive map</p>
@@ -155,18 +158,19 @@
     <h2>How it measures up</h2>
     <p>Developed and tuned on a 105-record hand-adjudicated gold set (pairwise precision ≈ 0.996 on
       that set, an optimistic figure because the clustering threshold was calibrated against it),
-      then tested out of sample against Who Owns What on a blind, preregistered sample of the
-      candidate frame:</p>
+      then measured on the links it would add on top of Who Owns What, using a stratified sample
+      of the candidate frame:</p>
     <figure>
-      <img src="measured-vs-wow.svg"
-           alt="On the 67 sampled splink merges where splink and JustFix disagree, splink is right 64 times and JustFix 3 — McNemar p < 0.001.">
-      <figcaption>Head-to-head on the model frame — splink merges vs Who Owns What, scored
-        against one human annotator's blind labels.</figcaption>
+      <img src="precision-of-added-links.svg"
+           alt="Precision of the links the model adds: 97% of 150 sampled links were the same owner; 64 of the 67 that join separate Who Owns What portfolios were correct; by stage, 49 of 49 through name and address and 15 of 18 through the shared-company pass.">
+      <figcaption>Precision of the links the model adds, by how they were linked. Labels: one human
+        annotator (an LLM second reader and an LLM-conducted resolution leave the figures unchanged).
+        Recall is not estimated, and the split by stage is exploratory.</figcaption>
     </figure>
     <div class="stats">
-      <div class="stat"><div class="n">96.7%</div><div class="l">splink merge precision (Wilson 92–99%)</div></div>
-      <div class="stat"><div class="n">≈5,000</div><div class="l">Who Owns What false-splits recovered</div></div>
-      <div class="stat"><div class="n">64 of 67</div><div class="l">sampled links beyond Who Owns What's own were correct (95.5%, Wilson 88–99%)</div></div>
+      <div class="stat"><div class="n">96.7%</div><div class="l">of sampled model links judged the same owner (Wilson 92–99%)</div></div>
+      <div class="stat"><div class="n">64 of 67</div><div class="l">sampled links that join separate Who Owns What portfolios were correct (95.5%, Wilson 88–99%)</div></div>
+      <div class="stat"><div class="n">15 of 18</div><div class="l">links through the shared-company second pass, versus 49 of 49 through name and address (small samples, exploratory)</div></div>
     </div>
   </div>
 </section>
